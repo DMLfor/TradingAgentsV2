@@ -1,7 +1,7 @@
 """TDX Data — 通信达行情数据读取与查询包
 
 快速上手:
-    from tdx_data import TdxQuery
+    from tdx_core import TdxQuery
 
     with TdxQuery() as q:
         df = q.get_daily("000001")

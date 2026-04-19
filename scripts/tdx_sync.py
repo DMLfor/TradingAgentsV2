@@ -17,10 +17,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from tdx_data.config import TdxConfig
-from tdx_data.sync import TdxSyncEngine
-from tdx_data.models import SyncResult
-from tdx_data.notify import send_notification
+from tdx_core.config import TdxConfig
+from tdx_core.sync import TdxSyncEngine
+from tdx_core.models import SyncResult
+from tdx_core.notify import send_notification
 
 
 def setup_logging(config: TdxConfig):

@@ -10,7 +10,7 @@
 TradingAgentsV2/
 ├── docs/
 │   └── TDX_DATA_SOLUTION_V1.md          # 本文档
-├── tdx_data/
+├── tdx_core/
 │   ├── __init__.py
 │   ├── config.py                         # 全局配置（路径、数据库、批次参数）
 │   ├── reader.py                         # TdxReader 封装类（基于 mootdx）
@@ -816,9 +816,9 @@ import argparse
 import logging
 import sys
 import time
-from tdx_data.config import TdxConfig
-from tdx_data.sync import TdxSyncEngine
-from tdx_data.notify import send_notification
+from tdx_core.config import TdxConfig
+from tdx_core.sync import TdxSyncEngine
+from tdx_core.notify import send_notification
 
 def setup_logging(config: TdxConfig):
     log_dir = Path(config.log_dir)
@@ -942,7 +942,7 @@ def mock_daily_df():
 
 @pytest.fixture
 def tdx_config(tmp_path):
-    from tdx_data.config import TdxConfig
+    from tdx_core.config import TdxConfig
     return TdxConfig(
         tdx_dir=str(tmp_path / "tdx"),
         db_path=str(tmp_path / "test.db"),
@@ -955,7 +955,7 @@ def tdx_config(tmp_path):
 import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
-from tdx_data.reader import TdxReader, TdxReadError
+from tdx_core.reader import TdxReader, TdxReadError
 
 class TestTdxReader:
     def test_read_daily_success(self, mock_daily_df, tdx_config):

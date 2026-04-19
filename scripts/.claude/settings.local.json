@@ -10,7 +10,11 @@
       "Bash(git -C /c/Users/dblank/code/TradingAgentsV2 status)",
       "Read(//c/Users/dblank/code/**)",
       "Bash(echo \"exit: $?\")",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(cmd.exe *)",
+      "Bash(powershell.exe -Command 'Get-Process | Where-Object { $_.Path -like '\\\\''*TradingAgentsV2*'\\\\'' } | Select-Object Id, ProcessName, Path')",
+      "Bash(pip uninstall *)",
+      "Bash(pip install *)"
     ]
   }
 }

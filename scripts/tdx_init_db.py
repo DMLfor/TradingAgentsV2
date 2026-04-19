@@ -5,8 +5,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from tdx_data.config import TdxConfig
-from tdx_data.db import TdxDatabase
+from tdx_core.config import TdxConfig
+from tdx_core.db import TdxDatabase
 
 
 def main():

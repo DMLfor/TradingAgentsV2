@@ -6,7 +6,7 @@
 
 ```
 TradingAgentsV2/
-├── tdx_data/            # 核心 Python 包
+├── tdx_core/            # 核心 Python 包
 │   ├── __init__.py      # 公共 API 导出
 │   ├── config.py        # TdxConfig 配置类
 │   ├── db.py            # TdxDatabase 底层操作（读/写）
@@ -38,7 +38,7 @@ TradingAgentsV2/
 pip install -e .
 ```
 
-这会将 `tdx_data` 以开发模式安装，之后在任何目录都能直接 `import`。
+这会将 `tdx_core` 以开发模式安装，之后在任何目录都能直接 `import`。
 
 ### 2. 配置数据库
 
@@ -56,7 +56,7 @@ mysql_database: "tdx_data"
 ### 3. 查询数据
 
 ```python
-from tdx_data import TdxQuery
+from tdx_core import TdxQuery
 
 with TdxQuery() as q:
     # 日线
@@ -90,7 +90,7 @@ pip install -e C:\Users\dblank\code\TradingAgentsV2
 之后在任意 Python 环境中：
 
 ```python
-from tdx_data import TdxQuery
+from tdx_core import TdxQuery
 
 q = TdxQuery()  # 自动加载默认配置
 df = q.get_daily("000001")
@@ -101,7 +101,7 @@ df = q.get_daily("000001")
 ```python
 import sys
 sys.path.insert(0, r"C:\Users\dblank\code\TradingAgentsV2")
-from tdx_data import TdxQuery
+from tdx_core import TdxQuery
 ```
 
 ### 方法 C：PYTHONPATH 环境变量
@@ -117,7 +117,7 @@ export PYTHONPATH=/path/to/TradingAgentsV2
 ## 自定义配置
 
 ```python
-from tdx_data import TdxConfig, TdxQuery
+from tdx_core import TdxConfig, TdxQuery
 
 # 手动构造
 config = TdxConfig(

@@ -3,7 +3,7 @@
 适用于：MySQL 不在本机、或从其它项目目录调用
 
 用法:
-    cd TradingAgentsV2
+    cd tdx_data
     python -m examples.02_custom_config
 """
 import sys
@@ -13,7 +13,7 @@ ROOT = str(Path(__file__).resolve().parent.parent)
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from tdx_data import TdxConfig, TdxQuery
+from tdx_core import TdxConfig, TdxQuery
 
 
 def main():

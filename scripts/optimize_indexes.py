@@ -10,8 +10,8 @@ import time
 
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent.parent))
 
-from tdx_data.config import TdxConfig
-from tdx_data.db import TdxDatabase
+from tdx_core.config import TdxConfig
+from tdx_core.db import TdxDatabase
 
 
 INDEXES = {

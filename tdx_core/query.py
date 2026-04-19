@@ -1,7 +1,7 @@
 """高层查询 API — 从其它项目直接 import 即可使用
 
 典型用法:
-    from tdx_data import TdxQuery
+    from tdx_core import TdxQuery
 
     q = TdxQuery()                       # 默认读 config/tdx_config.yaml
     df = q.get_daily("000001")            # 日线

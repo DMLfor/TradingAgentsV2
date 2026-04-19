@@ -2,8 +2,8 @@
 import pandas as pd
 import pytest
 
-from tdx_data.db import TdxDatabase
-from tdx_data.models import FileInfo
+from tdx_core.db import TdxDatabase
+from tdx_core.models import FileInfo
 
 
 class TestTdxDatabaseInit:

@@ -9,7 +9,7 @@ ROOT = str(Path(__file__).resolve().parent.parent)
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from tdx_data import TdxQuery
+from tdx_core import TdxQuery
 
 
 def main():

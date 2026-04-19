@@ -8,8 +8,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from tdx_data.config import TdxConfig
-from tdx_data.models import FileInfo
+from tdx_core.config import TdxConfig
+from tdx_core.models import FileInfo
 
 
 @pytest.fixture

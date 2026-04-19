@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
-from tdx_data.models import FileInfo, SyncResult, SyncStatus
-from tdx_data.sync import TdxSyncEngine
+from tdx_core.models import FileInfo, SyncResult, SyncStatus
+from tdx_core.sync import TdxSyncEngine
 
 
 class TestSyncEngineFullImport:

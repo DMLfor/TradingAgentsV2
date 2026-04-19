@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init *)",
+      "Bash(sed 's/.*\\\\.//')",
+      "Bash(xxd /c/new_tdx_mock/vipdoc/sh/lday/sh000001.day)",
+      "Bash(python3 *)",
+      "Bash(sed 's/\\\\..*//')",
+      "Bash(pip list *)",
+      "Bash(python -c \"from mootdx.reader import Reader; print\\('import ok'\\)\")",
+      "Bash(python *)",
+      "Bash(pip install *)",
+      "Bash(where mysql *)",
+      "Bash(winget install *)",
+      "Bash(net start *)",
+      "Bash(\"/c/Program Files/MySQL/MySQL Server 8.4/bin/mysql_configurator.exe\" --help)",
+      "Bash(\"/c/Program Files/MySQL/MySQL Server 8.4/bin/mysqld.exe\" --initialize-insecure --basedir=\"/c/Program Files/MySQL/MySQL Server 8.4\" --datadir=\"/c/Program Files/MySQL/MySQL Server 8.4/data\")",
+      "Bash(mkdir -p /c/Users/dblank/mysql_data)",
+      "Bash(\"/c/Program Files/MySQL/MySQL Server 8.4/bin/mysqld.exe\" --initialize-insecure --basedir=\"C:/Program Files/MySQL/MySQL Server 8.4\" --datadir=\"C:/Users/dblank/mysql_data\")",
+      "Bash(\"/c/Program Files/MySQL/MySQL Server 8.4/bin/mysqld.exe\" --basedir=\"C:/Program Files/MySQL/MySQL Server 8.4\" --datadir=\"C:/Users/dblank/mysql_data\" --port=3306)",
+      "Bash(\"/c/Program Files/MySQL/MySQL Server 8.4/bin/mysql.exe\" -u root --skip-password -e \"SELECT VERSION\\(\\);\")",
+      "Bash('/c/Program Files/MySQL/MySQL Server 8.4/bin/mysql.exe' -u root --skip-password -e ' *)",
+      "Bash('/c/Program Files/MySQL/MySQL Server 8.4/bin/mysql.exe' -u root -ptdx123456 -e ' *)",
+      "Bash('/c/Program Files/MySQL/MySQL Server 8.4/bin/mysql.exe' -u root -ptdx123456)",
+      "Bash('/c/Program Files/MySQL/MySQL Server 8.4/bin/mysql.exe' -u root -ptdx123456 -e 'USE tdx_data; SHOW TABLES;')",
+      "Bash($MYSQL *)",
+      "Bash(tasklist /FI \"IMAGENAME eq mysqld.exe\")",
+      "Bash(\"C:\\\\Program Files\\\\MySQL\\\\MySQL Server 8.4\\\\bin\\\\mysqld.exe\" --basedir=\"C:\\\\Program Files\\\\MySQL\\\\MySQL Server 8.4\" --datadir=\"C:\\\\Users\\\\dblank\\\\mysql_data\" --port=3306 --console)",
+      "Bash(\"C:\\\\Program Files\\\\MySQL\\\\MySQL Server 8.4\\\\bin\\\\mysql.exe\" -u root -ptdx123456 -e \"SELECT 1 AS test\")",
+      "Bash(C:\\\\Program Files\\\\MySQL\\\\MySQL Server 8.4\\\\bin\\\\mysql.exe *)",
+      "Bash(\"C:\\\\Program Files\\\\MySQL\\\\MySQL Server 8.4\\\\bin\\\\mysql.exe\" -u root -ptdx123456 -e \"SELECT COUNT\\(*\\) AS daily_rows FROM tdx_data.tdx_daily; SELECT COUNT\\(*\\) AS registry_rows FROM tdx_data.tdx_file_registry;\")",
+      "Bash(tasklist /FI \"IMAGENAME eq python.exe\")",
+      "Bash(wmic process *)",
+      "Bash(taskkill *)",
+      "Bash(cmd.exe *)",
+      "Bash(\"C:\\\\Program Files\\\\MySQL\\\\MySQL Server 8.4\\\\bin\\\\mysql.exe\" -u root -ptdx123456 -e \"SELECT COUNT\\(*\\) AS daily_rows FROM tdx_data.tdx_daily;\")",
+      "Bash(powershell *)"
+    ]
+  }
+}

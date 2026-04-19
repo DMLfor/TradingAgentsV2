@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from tdx_data.config import TdxConfig
+from tdx_core.config import TdxConfig
 
 
 class TestTdxConfig:

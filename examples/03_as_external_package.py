@@ -5,7 +5,7 @@
 方法A — 代码中添加路径（简单直接）:
     import sys
     sys.path.insert(0, r"C:\Users\dblank\code\TradingAgentsV2")
-    from tdx_data import TdxQuery
+    from tdx_core import TdxQuery
 
 方法B — 设置 PYTHONPATH 环境变量:
     set PYTHONPATH=C:\Users\dblank\\code\\TradingAgentsV2
@@ -14,14 +14,14 @@
 方法C — pip install -e（开发模式，推荐长期使用）:
     1. 在 TradingAgentsV2 根目录创建 pyproject.toml（见 README）
     2. pip install -e C:\\Users\\dblank\\code\\TradingAgentsV2
-    3. 之后任意位置 from tdx_data import TdxQuery
+    3. 之后任意位置 from tdx_core import TdxQuery
 """
 import sys
 
 # === 这一行是关键 ===
 sys.path.insert(0, r"C:\Users\dblank\code\TradingAgentsV2")
 
-from tdx_data import TdxQuery
+from tdx_core import TdxQuery
 
 
 def main():

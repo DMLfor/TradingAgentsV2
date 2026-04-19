@@ -1,7 +1,7 @@
 """示例1：基本查询 — 日线、分钟线、股票列表
 
 用法:
-    cd TradingAgentsV2
+    cd tdx_data
     python -m examples.01_basic_query
 """
 import sys
@@ -12,7 +12,7 @@ ROOT = str(Path(__file__).resolve().parent.parent)
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from tdx_data import TdxQuery
+from tdx_core import TdxQuery
 
 
 def main():

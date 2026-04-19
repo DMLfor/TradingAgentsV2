@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from tdx_data.models import FileInfo
-from tdx_data.scanner import TdxScanner
+from tdx_core.models import FileInfo
+from tdx_core.scanner import TdxScanner
 
 
 class TestTdxScannerScanAll:

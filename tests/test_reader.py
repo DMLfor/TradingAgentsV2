@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
-from tdx_data.reader import TdxReadError, TdxReader
+from tdx_core.reader import TdxReadError, TdxReader
 
 
 class TestTdxReaderReadDaily:
