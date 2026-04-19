@@ -1,0 +1,27 @@
+# 通信达数据同步配置
+tdx_dir: "C:\\new_tdx_mock"
+
+# 数据库配置
+db_type: "mysql"  # "mysql" 或 "sqlite"
+db_path: "tdx_data.db"  # SQLite 文件路径（db_type=sqlite 时使用）
+
+# MySQL 连接参数
+mysql_host: "127.0.0.1"
+mysql_port: 3306
+mysql_user: "root"
+mysql_password: "tdx123456"
+mysql_database: "tdx_data"
+
+batch_size: 20000
+max_retries: 3
+retry_delay: 1.0
+log_dir: "logs"
+log_retention_days: 30
+
+# 通知配置（按需填写）
+dingtalk_webhook: ""
+smtp_host: ""
+smtp_port: 465
+smtp_user: ""
+smtp_password: ""
+notify_email: ""

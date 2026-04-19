@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(python -c \"from tdx_data import TdxConfig, TdxDatabase, TdxQuery, Market, DataType, SyncStatus; print\\('All imports OK'\\); print\\('TdxQuery methods:', [m for m in dir\\(TdxQuery\\) if not m.startswith\\('_'\\)]\\)\")",
+      "Bash(python *)",
+      "mcp__plugin_oh-my-claudecode_t__notepad_write_priority",
+      "mcp__plugin_oh-my-claudecode_t__notepad_write_manual",
+      "mcp__plugin_oh-my-claudecode_t__project_memory_add_note",
+      "Bash(git -C /c/Users/dblank/code/TradingAgentsV2 status)",
+      "Read(//c/Users/dblank/code/**)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(git add *)"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+# Database files
+*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Test / coverage
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Tool metadata
+.omc/
+
+# Logs
+logs/
