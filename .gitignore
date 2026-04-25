@@ -27,6 +27,14 @@ logs/
 .env
 .claude/
 claw_ready/
+.kimi/
 
 # Local config (contains real passwords)
 config/tdx_config.yaml
+
+# Build artifacts
+claw_ready.zip
+
+# Generated results & temp files
+results/
+tmp_*.py

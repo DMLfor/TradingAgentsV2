@@ -1,0 +1,42 @@
+{
+  "name": "移动止损趋势",
+  "description": "MA20>MA60 买入，8%回撤移动止损卖出",
+  "universe": {
+    "codes": "515180",
+    "min_price": 0.1,
+    "max_price": 10000,
+    "exclude_st": false
+  },
+  "lookback": 120,
+  "initial_capital": 1000000,
+  "position": {
+    "max_holding": 1,
+    "per_position": 1.0,
+    "weight_by": "equal"
+  },
+  "rebalance": {
+    "frequency": "daily"
+  },
+  "costs": {
+    "commission_buy": 0.00025,
+    "commission_sell": 0.00025,
+    "tax_sell": 0.0,
+    "slippage": 0.0001
+  },
+  "entry": {
+    "conditions": [
+      {
+        "indicator": "ma_20",
+        "op": ">",
+        "value": "ma_60"
+      }
+    ]
+  },
+  "exit": {
+    "conditions": [],
+    "stop_loss": null,
+    "take_profit": null,
+    "max_hold_days": null,
+    "trailing_stop": 0.08
+  }
+}

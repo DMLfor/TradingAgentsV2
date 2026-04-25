@@ -1,0 +1,47 @@
+{
+  "name": "RSI40 反弹",
+  "description": "RSI<40 买入，RSI>60 卖出",
+  "universe": {
+    "codes": "515180",
+    "min_price": 0.1,
+    "max_price": 10000,
+    "exclude_st": false
+  },
+  "lookback": 120,
+  "initial_capital": 1000000,
+  "position": {
+    "max_holding": 1,
+    "per_position": 1.0,
+    "weight_by": "equal"
+  },
+  "rebalance": {
+    "frequency": "daily"
+  },
+  "costs": {
+    "commission_buy": 0.00025,
+    "commission_sell": 0.00025,
+    "tax_sell": 0.0,
+    "slippage": 0.0001
+  },
+  "entry": {
+    "conditions": [
+      {
+        "indicator": "rsi",
+        "op": "<",
+        "value": 40
+      }
+    ]
+  },
+  "exit": {
+    "conditions": [
+      {
+        "indicator": "rsi",
+        "op": ">",
+        "value": 60
+      }
+    ],
+    "stop_loss": -0.05,
+    "take_profit": 0.1,
+    "max_hold_days": 30
+  }
+}

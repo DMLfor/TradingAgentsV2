@@ -1,0 +1,52 @@
+# TradingAgentsV2 Claw 定时任务配置
+# 修改后需重新运行: python scripts/claw_register.py --reload
+
+tasks:
+  - name: ETFTracker-515180
+    description: "红利ETF 515180 RSI30反弹信号跟踪 (回测: +71.38%, Sharpe 1.48)"
+    command: 'tdx signal -c 515180 -s rsi30_bounce --save'
+    workdir: "{root}"
+    schedule:
+      type: daily
+      at: "09:00"
+      days: [Mon, Tue, Wed, Thu, Fri]
+      random_offset: [1, 15]
+    enabled: true
+
+  - name: ETFTracker-159545
+    description: "港股红利ETF 159545 MACD金叉信号跟踪 (回测: +26.32%, Sharpe 1.26)"
+    command: 'tdx signal -c 159545 -s macd_golden --save'
+    workdir: "{root}"
+    schedule:
+      type: daily
+      at: "09:00"
+      days: [Mon, Tue, Wed, Thu, Fri]
+      random_offset: [1, 15]
+    enabled: true
+
+  - name: GrowthBoardRank
+    description: "创业板技术分析排名 Top 100"
+    command: 'tdx rank --bars 120 --top 100 --save'
+    workdir: "{root}"
+    schedule:
+      type: daily
+      at: "19:00"
+      days: [Mon, Tue, Wed, Thu, Fri]
+    enabled: true
+
+  - name: MarketScan-MACD
+    description: "市场扫描 — MACD 金叉"
+    command: 'python "{root}\scripts\scan_market.py" 000001,000002,600000 --indicator macd --signal golden_cross --save'
+    workdir: "{root}"
+    schedule:
+      type: daily
+      at: "19:30"
+      days: [Mon, Tue, Wed, Thu, Fri]
+    enabled: false
+
+settings:
+  task_folder: "TradingAgentsV2"
+  execution_time_limit: "PT30M"
+  priority: 7
+  stop_on_battery: false
+  wake_to_run: false

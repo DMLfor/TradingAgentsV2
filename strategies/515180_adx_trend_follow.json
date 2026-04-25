@@ -1,0 +1,57 @@
+{
+  "name": "ADX 趋势跟踪",
+  "description": "ADX>25 且价格>MA20 买入，ADX<20 或价格<MA20 卖出",
+  "universe": {
+    "codes": "515180",
+    "min_price": 0.1,
+    "max_price": 10000,
+    "exclude_st": false
+  },
+  "lookback": 120,
+  "initial_capital": 1000000,
+  "position": {
+    "max_holding": 1,
+    "per_position": 1.0,
+    "weight_by": "equal"
+  },
+  "rebalance": {
+    "frequency": "daily"
+  },
+  "costs": {
+    "commission_buy": 0.00025,
+    "commission_sell": 0.00025,
+    "tax_sell": 0.0,
+    "slippage": 0.0001
+  },
+  "entry": {
+    "conditions": [
+      {
+        "indicator": "adx",
+        "op": ">",
+        "value": 25
+      },
+      {
+        "indicator": "close_val",
+        "op": ">",
+        "value": "ma_20"
+      }
+    ]
+  },
+  "exit": {
+    "conditions": [
+      {
+        "indicator": "adx",
+        "op": "<",
+        "value": 20
+      },
+      {
+        "indicator": "close_val",
+        "op": "<",
+        "value": "ma_20"
+      }
+    ],
+    "stop_loss": -0.08,
+    "take_profit": null,
+    "max_hold_days": 60
+  }
+}

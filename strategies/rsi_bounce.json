@@ -1,0 +1,43 @@
+{
+  "name": "RSI 超卖反弹策略",
+  "description": "选择 RSI 超卖后反弹的股票，RSI 回到中性区或触及止损时卖出",
+  "universe": {
+    "board": "创业板",
+    "min_price": 5,
+    "max_price": 500,
+    "exclude_st": true
+  },
+  "lookback": 60,
+  "initial_capital": 1000000,
+  "position": {
+    "max_holding": 10,
+    "per_position": 0.1,
+    "weight_by": "equal"
+  },
+  "entry": {
+    "conditions": [
+      {"indicator": "rsi", "op": "<", "value": 35},
+      {"indicator": "composite_score", "op": ">=", "value": 5.0}
+    ],
+    "rank_by": "composite_score",
+    "direction": "desc",
+    "limit": 10
+  },
+  "exit": {
+    "conditions": [
+      {"indicator": "rsi", "op": ">", "value": 65}
+    ],
+    "stop_loss": -0.06,
+    "take_profit": 0.12,
+    "max_hold_days": 10
+  },
+  "rebalance": {
+    "frequency": "daily"
+  },
+  "costs": {
+    "commission_buy": 0.00025,
+    "commission_sell": 0.00025,
+    "tax_sell": 0.001,
+    "slippage": 0.0001
+  }
+}

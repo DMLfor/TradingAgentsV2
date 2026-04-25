@@ -1,0 +1,44 @@
+{
+  "name": "高分突破策略",
+  "description": "选择综合评分 Top 20 且突破布林上轨的股票，跌破中轨或评分低于 6 时卖出",
+  "universe": {
+    "board": "创业板",
+    "min_price": 5,
+    "max_price": 500,
+    "exclude_st": true
+  },
+  "lookback": 60,
+  "initial_capital": 1000000,
+  "position": {
+    "max_holding": 15,
+    "per_position": 0.067,
+    "weight_by": "equal"
+  },
+  "entry": {
+    "conditions": [
+      {"indicator": "composite_score", "op": ">=", "value": 7.5},
+      {"indicator": "bollinger", "signal": "touch_upper"}
+    ],
+    "rank_by": "composite_score",
+    "direction": "desc",
+    "limit": 15
+  },
+  "exit": {
+    "conditions": [
+      {"indicator": "composite_score", "op": "<", "value": 6.0},
+      {"indicator": "bollinger", "signal": "touch_lower"}
+    ],
+    "stop_loss": -0.10,
+    "take_profit": 0.25,
+    "max_hold_days": 15
+  },
+  "rebalance": {
+    "frequency": "daily"
+  },
+  "costs": {
+    "commission_buy": 0.00025,
+    "commission_sell": 0.00025,
+    "tax_sell": 0.001,
+    "slippage": 0.0001
+  }
+}

@@ -11,11 +11,15 @@ dependencies = [
     "pymysql>=1.1",
     "pandas>=2.0",
     "pyyaml>=6.0",
+    "numpy>=1.24",
 ]
 
 [project.optional-dependencies]
 reader = ["mootdx>=0.11.7"]
 dev = ["pytest>=7.0", "pytest-cov>=4.0"]
+
+[project.scripts]
+tdx = "tdx_core.cli:cli"
 
 [tool.setuptools.packages.find]
 include = ["tdx_core*"]
