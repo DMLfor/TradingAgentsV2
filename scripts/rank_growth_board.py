@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""创业板全量股票技术分析排名 — 120日数据批量评分.
+"""板块全量股票技术分析排名 — 120日数据批量评分.
 
 Usage:
     python scripts/rank_growth_board.py
-    python scripts/rank_growth_board.py --bars 120 --top 100
-    python scripts/rank_growth_board.py --save
+    python scripts/rank_growth_board.py --board 创业板 --bars 120 --top 100
+    python scripts/rank_growth_board.py --board 科创板 --save
 """
 
 from __future__ import annotations
@@ -87,7 +87,7 @@ def phase2_score(item: dict[str, Any], vol_percentile: float) -> dict[str, Any] 
         return None
 
 
-def run_analysis(codes: list[str], bars: int, top_n: int) -> list[dict]:
+def run_analysis(codes: list[str], bars: int, top_n: int, board_name: str = "创业板") -> list[dict]:
     """Run concurrent analysis with relative volatility scoring."""
     # ── Phase 1 ──
     items: list[dict] = []
@@ -95,7 +95,7 @@ def run_analysis(codes: list[str], bars: int, top_n: int) -> list[dict]:
     processed = 0
     success = 0
 
-    print(f"▌创业板技术分析排名 ({bars}日数据)")
+    print(f"▌{board_name}技术分析排名 ({bars}日数据)")
     print(f"  总股票数: {total}  |  并发线程: {MAX_WORKERS}")
     print(f"  Phase1 开始: {datetime.now().strftime('%H:%M:%S')}")
     print()
@@ -158,11 +158,11 @@ def _bar(percent: float, width: int = 12) -> str:
     return "█" * filled + "░" * (width - filled)
 
 
-def print_top(results: list[dict], top_n: int) -> str:
+def print_top(results: list[dict], top_n: int, board_name: str = "创业板") -> str:
     """Print and return the top-N ranking table."""
     lines = []
     lines.append("╔" + "═" * 108 + "╗")
-    lines.append(f"║  创业板技术分析排名 Top {top_n:<3} (120日综合评分){' ' * 60}║")
+    lines.append(f"║  {board_name}技术分析排名 Top {top_n:<3} (120日综合评分){' ' * (64 - len(board_name) * 2)}║")
     lines.append("╠" + "═" * 108 + "╣")
     header = f"  {'排名':<4} {'代码':<8} {'名称':<10} {'一级行业':<8} {'二级行业':<8} {'趋势':>5} {'动量':>5} {'波动':>5} {'量价':>5} {'综合':>5} {'研判':<8}"
     lines.append(f"║{header:<108}║")
@@ -208,24 +208,25 @@ def print_distribution(results: list[dict]) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="创业板全量股票技术分析排名")
+    parser = argparse.ArgumentParser(description="板块全量股票技术分析排名")
+    parser.add_argument("--board", "-b", default="创业板", help="板块名称 (default: 创业板)")
     parser.add_argument("--bars", type=int, default=BARS_DEFAULT, help="分析窗口天数 (default: 120)")
     parser.add_argument("--top", type=int, default=TOP_N_DEFAULT, help="输出Top N (default: 100)")
     parser.add_argument("--save", action="store_true", help="保存结果到 reports/rankings/")
     args = parser.parse_args()
 
-    # Get all 创业板 codes
-    codes = by_board("创业板")
+    # Get board codes
+    codes = by_board(args.board)
     if not codes:
-        print("[ERROR] 未找到创业板股票，请确认 metadata 已生成")
+        print(f"[ERROR] 未找到板块 '{args.board}' 的股票，请确认 metadata 已生成")
         print("Run: python scripts/update_stock_metadata.py")
         sys.exit(1)
 
-    print(f"  创业板股票数: {len(codes)}")
+    print(f"  {args.board}股票数: {len(codes)}")
     print()
 
     # Run analysis
-    all_results = run_analysis(codes, args.bars, args.top)
+    all_results = run_analysis(codes, args.bars, args.top, board_name=args.board)
 
     if not all_results:
         print("[ERROR] 没有成功分析任何股票")
@@ -236,13 +237,14 @@ def main():
 
     # Print top table
     top_results = all_results[:args.top]
-    text = print_top(top_results, args.top)
+    text = print_top(top_results, args.top, board_name=args.board)
 
     # Save
     if args.save:
         out_dir = Path(ROOT) / "reports" / "rankings"
         out_dir.mkdir(parents=True, exist_ok=True)
-        out_path = out_dir / f"growth_board_rank_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        safe_name = args.board.replace("/", "_").replace("\\", "_")
+        out_path = out_dir / f"{safe_name}_rank_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         out_path.write_text(text, encoding="utf-8")
         print(f"\n[Saved] {out_path}")
 

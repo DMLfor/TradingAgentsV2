@@ -135,7 +135,7 @@ def scan(codes: str, indicator: str, signal: str | None, save: bool):
 @click.option("--save", is_flag=True, help="保存报告")
 def rank(board: str, bars: int, top: int, save: bool):
     """板块全量股票技术分析排名."""
-    args = ["--bars", str(bars), "--top", str(top)]
+    args = ["--board", board, "--bars", str(bars), "--top", str(top)]
     if save:
         args.append("--save")
     _run_script("rank_growth_board.py", args)
