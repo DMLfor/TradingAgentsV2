@@ -9,6 +9,7 @@ description = "通信达行情数据读取与查询包（MySQL/SQLite）"
 requires-python = ">=3.9"
 dependencies = [
     "click>=8.0",
+    "minishare>=0.1005",
     "pymysql>=1.1",
     "pandas>=2.0",
     "pyyaml>=6.0",

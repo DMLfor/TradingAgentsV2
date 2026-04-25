@@ -36,6 +36,9 @@ class TdxConfig:
     smtp_password: str = ""
     notify_email: str = ""
 
+    # minishare API
+    minishare_token: str = ""
+
     # Metadata files
     metadata_path: str = "config/stock_metadata.json"
     names_path: str = "config/stock_names.json"
@@ -65,6 +68,8 @@ class TdxConfig:
             self.mysql_password = os.getenv("MYSQL_PASSWORD")
         if os.getenv("TDX_DB_PATH"):
             self.db_path = os.getenv("TDX_DB_PATH")
+        if os.getenv("MINISHARE_TOKEN"):
+            self.minishare_token = os.getenv("MINISHARE_TOKEN")
 
     @property
     def vipdoc_dir(self) -> Path:

@@ -264,6 +264,36 @@ def export(output: str, skip_verify: bool):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# sync-api — minishare API 同步到本地数据库
+# ═══════════════════════════════════════════════════════════════════════════
+
+@cli.command("sync-api")
+@click.option("--codes", help="逗号分隔的股票代码")
+@click.option("--watchlist", help="代码列表文件路径")
+@click.option("--all-shsz", is_flag=True, help="同步本地数据库中全部沪深代码")
+@click.option("--etf-only", is_flag=True, help="仅同步 ETF")
+@click.option("--dry-run", is_flag=True, help="预览不写入")
+@click.option("--verbose", "-v", is_flag=True, help="详细日志")
+def sync_api(codes: str | None, watchlist: str | None, all_shsz: bool,
+             etf_only: bool, dry_run: bool, verbose: bool):
+    """从 minishare API 同步实时日线到本地数据库."""
+    args = []
+    if codes:
+        args.extend(["--codes", codes])
+    if watchlist:
+        args.extend(["--watchlist", watchlist])
+    if all_shsz:
+        args.append("--all-shsz")
+    if etf_only:
+        args.append("--etf-only")
+    if dry_run:
+        args.append("--dry-run")
+    if verbose:
+        args.append("--verbose")
+    _run_script("sync_minishare.py", args)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # list-indicators / list-strategies
 # ═══════════════════════════════════════════════════════════════════════════
 

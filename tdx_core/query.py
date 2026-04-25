@@ -19,6 +19,7 @@ import pandas as pd
 
 from .config import TdxConfig
 from .db import TdxDatabase
+from .minishare_client import MinishareClient, MinishareError
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,9 @@ logger = logging.getLogger(__name__)
 class TdxQuery:
     """高层查询接口，封装 TdxDatabase 的常用读取操作"""
 
-    def __init__(self, config: Optional[TdxConfig] = None, yaml_path: Optional[str] = None):
+    def __init__(self, config: Optional[TdxConfig] = None,
+                 yaml_path: Optional[str] = None,
+                 minishare_client: Optional[MinishareClient] = None):
         if config:
             self.config = config
         elif yaml_path:
@@ -39,6 +42,12 @@ class TdxQuery:
             else:
                 self.config = TdxConfig()
         self.db = TdxDatabase(self.config)
+        self._ms_client = minishare_client
+        if self._ms_client is None and self.config.minishare_token:
+            try:
+                self._ms_client = MinishareClient(self.config.minishare_token)
+            except MinishareError:
+                self._ms_client = None
 
     # ─── 日线 ───
 
@@ -136,6 +145,56 @@ class TdxQuery:
                 return pd.read_sql_query(sql, conn, params=params)
 
     # ─── 生命周期 ───
+
+    def refresh_live(self, codes: List[str]) -> int:
+        """从 minishare API 拉取实时快照并写入本地数据库.
+
+        Args:
+            codes: 6 位纯数字代码列表
+        Returns:
+            成功写入的行数
+        """
+        if self._ms_client is None:
+            logger.warning("refresh_live: MinishareClient 未初始化，跳过")
+            return 0
+
+        import pandas as pd
+        all_dfs = []
+        classified = {"stock": [], "etf": [], "index": []}
+        index_codes = {"000001", "000002", "000003", "000004",
+                       "399001", "399005", "399006", "399300", "000688"}
+        for code in codes:
+            if code in index_codes:
+                classified["index"].append(code)
+            elif code.startswith(("5", "15", "16")):
+                classified["etf"].append(code)
+            else:
+                classified["stock"].append(code)
+
+        for code_type, type_codes in classified.items():
+            if not type_codes:
+                continue
+            try:
+                if code_type == "stock":
+                    df = self._ms_client.get_snapshot(type_codes)
+                elif code_type == "etf":
+                    df = self._ms_client.get_etf_snapshot(type_codes)
+                elif code_type == "index":
+                    df = self._ms_client.get_index_snapshot(type_codes)
+                else:
+                    continue
+                if df is not None and not df.empty:
+                    all_dfs.append(df)
+            except MinishareError as exc:
+                logger.error("refresh_live [%s] 失败: %s", code_type, exc)
+
+        if not all_dfs:
+            return 0
+
+        combined = pd.concat(all_dfs, ignore_index=True)
+        rows = self.db.upsert_dataframe(combined, "tdx_daily")
+        logger.info("refresh_live: %d 行数据已更新到数据库", rows)
+        return rows
 
     def close(self):
         """TdxQuery 本身不持有长连接，此方法为接口一致性保留"""
