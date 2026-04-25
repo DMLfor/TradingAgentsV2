@@ -295,6 +295,39 @@ def sync_api(codes: str | None, watchlist: str | None, all_shsz: bool,
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# pick — 形态选股 + 交易计划
+# ═══════════════════════════════════════════════════════════════════════════
+
+@cli.command()
+@click.option("--codes", "-c", help="逗号分隔的股票代码")
+@click.option("--watchlist", "-w", help="关注列表文件路径")
+@click.option("--board", "-b", help="板块名称，如 创业板")
+@click.option("--level1", help="一级行业，如 电子")
+@click.option("--min-score", default=60, help="最低形态分 (default: 60)")
+@click.option("--min-rr", default=1.0, help="最低风报比 (default: 1.0)")
+@click.option("--top", "-n", default=20, help="输出 Top N")
+@click.option("--bars", default=120, help="分析窗口天数")
+@click.option("--save", is_flag=True, help="保存报告")
+def pick(codes: str | None, watchlist: str | None, board: str | None,
+         level1: str | None, min_score: float, min_rr: float, top: int,
+         bars: int, save: bool):
+    """多因子形态选股，生成买入价/止损价/目标价/仓位建议."""
+    args = ["--min-score", str(min_score), "--min-rr", str(min_rr),
+            "--top", str(top), "--bars", str(bars)]
+    if codes:
+        args.extend(["--codes", codes])
+    if watchlist:
+        args.extend(["--watchlist", watchlist])
+    if board:
+        args.extend(["--board", board])
+    if level1:
+        args.extend(["--level1", level1])
+    if save:
+        args.append("--save")
+    _run_script("tech_screener.py", args)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # list-indicators / list-strategies
 # ═══════════════════════════════════════════════════════════════════════════
 

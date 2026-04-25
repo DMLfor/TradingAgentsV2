@@ -37,4 +37,5 @@ claw_ready.zip
 
 # Generated results & temp files
 results/
+reports/
 tmp_*.py
