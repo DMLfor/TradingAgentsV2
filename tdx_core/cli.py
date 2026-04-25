@@ -54,7 +54,7 @@ def cli():
               help="策略名称")
 @click.option("--rsi-buy", type=float, default=30, help="RSI 买入阈值 (仅 RSI 策略)")
 @click.option("--rsi-sell", type=float, default=70, help="RSI 卖出阈值 (仅 RSI 策略)")
-@click.option("--save", is_flag=True, help="保存报告到 logs/")
+@click.option("--save", is_flag=True, help="保存报告到 reports/")
 def signal(code: str, strategy: str, rsi_buy: float, rsi_sell: float, save: bool):
     """生成交易信号报告 (BUY/SELL/HOLD + 强度分级 + 仓位建议)."""
     sys.path.insert(0, str(ROOT))
@@ -74,7 +74,7 @@ def signal(code: str, strategy: str, rsi_buy: float, rsi_sell: float, save: bool
 @cli.command()
 @click.option("--code", "-c", required=True, help="股票代码，如 688018")
 @click.option("--bars", "-b", default=60, help="分析周期（天数）")
-@click.option("--save", is_flag=True, help="保存报告到 logs/")
+@click.option("--save", is_flag=True, help="保存报告到 reports/")
 def analyze(code: str, bars: int, save: bool):
     """37 指标全量技术分析大师报告."""
     args = [code, "--bars", str(bars)]

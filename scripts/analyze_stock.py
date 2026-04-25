@@ -97,8 +97,8 @@ def analyze(code: str, indicators: list[str], save: bool = False):
     print(text)
 
     if save:
-        out_dir = Path(ROOT) / "logs"
-        out_dir.mkdir(exist_ok=True)
+        out_dir = Path(ROOT) / "reports" / "analysis"
+        out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / f"analysis_{code}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         out_path.write_text(text, encoding="utf-8")
         print(f"\n[Saved] {out_path}")
@@ -112,7 +112,7 @@ def main():
         default=",".join(DEFAULT_INDICATORS),
         help="Comma-separated indicator names",
     )
-    parser.add_argument("--save", "-s", action="store_true", help="Save report to logs/")
+    parser.add_argument("--save", "-s", action="store_true", help="Save report to reports/analysis/")
     args = parser.parse_args()
 
     try:

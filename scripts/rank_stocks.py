@@ -44,8 +44,8 @@ def rank(codes: list[str], indicator: str, column: str | None, ascending: bool, 
     print(text)
 
     if save:
-        out_dir = Path(ROOT) / "logs"
-        out_dir.mkdir(exist_ok=True)
+        out_dir = Path(ROOT) / "reports" / "rankings"
+        out_dir.mkdir(parents=True, exist_ok=True)
         fname = f"rank_{indicator}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         out_path = out_dir / fname
         out_path.write_text(text, encoding="utf-8")
@@ -58,7 +58,7 @@ def main():
     parser.add_argument("--indicator", "-i", required=True, help="Indicator name")
     parser.add_argument("--column", "-c", default=None, help="Specific column to rank by")
     parser.add_argument("--ascending", "-a", action="store_true", help="Sort ascending")
-    parser.add_argument("--save", action="store_true", help="Save report to logs/")
+    parser.add_argument("--save", action="store_true", help="Save report to reports/rankings/")
     args = parser.parse_args()
 
     try:

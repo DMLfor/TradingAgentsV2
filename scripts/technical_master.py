@@ -2181,8 +2181,8 @@ def analyze(code: str, bars: int = 250, save: bool = False) -> str:
     print(text)
 
     if save:
-        out_dir = Path(ROOT) / "logs"
-        out_dir.mkdir(exist_ok=True)
+        out_dir = Path(ROOT) / "reports" / "analysis"
+        out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / f"master_{resolved_code}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         out_path.write_text(text, encoding="utf-8")
         print(f"\n[Saved] {out_path}")
@@ -2194,7 +2194,7 @@ def main():
     parser = argparse.ArgumentParser(description="Technical Analysis Master Panel")
     parser.add_argument("code", help="Stock code, e.g. 688018")
     parser.add_argument("--bars", "-b", type=int, default=250, help="Number of bars to analyze (default: 250)")
-    parser.add_argument("--save", "-s", action="store_true", help="Save report to logs/")
+    parser.add_argument("--save", "-s", action="store_true", help="Save report to reports/analysis/")
     args = parser.parse_args()
 
     analyze(args.code, bars=args.bars, save=args.save)

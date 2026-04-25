@@ -73,7 +73,7 @@ TradingAgentsV2/
 ├── claw/
 │   ├── README.md                 # Claw 速查手册
 │   └── SUMMARY.md                # 本文档
-├── logs/                         # 报告输出目录
+├── reports/                      # 结构化报告输出目录（signals/rankings/scans/analysis/backtests/etf）
 │   ├── tracker_515180_*.txt
 │   ├── tracker_159545_*.txt
 │   ├── growth_board_rank_*.txt
@@ -150,7 +150,7 @@ python scripts/batch_backtest.py
 ### 数据流
 - 本地通达信 → MySQL（每日盘后同步）
 - 分析脚本 → 直接查询本地 MySQL
-- 报告输出 → `logs/` 目录
+- 报告输出 → `reports/` 目录（按类型分子目录）
 - 回测报告 → `results/backtest/` 目录
 
 ### 混合模式决策

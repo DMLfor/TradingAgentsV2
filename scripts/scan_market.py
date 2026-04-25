@@ -49,8 +49,8 @@ def scan(codes: list[str], indicator: str, signal_type: str | None, save: bool):
     print(text)
 
     if save:
-        out_dir = Path(ROOT) / "logs"
-        out_dir.mkdir(exist_ok=True)
+        out_dir = Path(ROOT) / "reports" / "scans"
+        out_dir.mkdir(parents=True, exist_ok=True)
         fname = f"scan_{indicator}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         out_path = out_dir / fname
         out_path.write_text(text, encoding="utf-8")
@@ -62,7 +62,7 @@ def main():
     parser.add_argument("codes", help="Comma-separated stock codes or names")
     parser.add_argument("--indicator", "-i", required=True, help="Indicator name, e.g. macd")
     parser.add_argument("--signal", "-s", default=None, help="Signal type, e.g. golden_cross")
-    parser.add_argument("--save", action="store_true", help="Save report to logs/")
+    parser.add_argument("--save", action="store_true", help="Save report to reports/scans/")
     args = parser.parse_args()
 
     try:

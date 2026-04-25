@@ -398,8 +398,8 @@ def analyze(code: str, bars: int, grid_count: int, save: bool):
     print(text)
 
     if save:
-        out_dir = Path(ROOT) / "logs"
-        out_dir.mkdir(exist_ok=True)
+        out_dir = Path(ROOT) / "reports" / "etf"
+        out_dir.mkdir(parents=True, exist_ok=True)
         fname = f"tracker_{code}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         out_path = out_dir / fname
         out_path.write_text(text, encoding="utf-8")

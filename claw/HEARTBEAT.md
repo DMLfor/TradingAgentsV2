@@ -15,7 +15,7 @@ Automatically check定时任务 execution results when Claw wakes up via heartbe
 
 2. **What it does:**
    - Lists all registered tasks and their actual next-run times
-   - Checks `logs/` directory for today's new reports
+   - Checks `reports/` directory for today's new reports
    - Shows the latest report for each active task (515180, 159545, GrowthBoardRank)
 
 3. **Report to user:**
@@ -26,9 +26,9 @@ Automatically check定时任务 execution results when Claw wakes up via heartbe
 
 | Task | Log File Pattern |
 |:---|:---|
-| ETFTracker-515180 | `logs/signal_515180_rsi30_bounce_YYYYMMDD_*.txt` |
-| ETFTracker-159545 | `logs/signal_159545_macd_golden_YYYYMMDD_*.txt` |
-| GrowthBoardRank | `logs/growth_board_rank_YYYYMMDD_*.txt` |
+| ETFTracker-515180 | `reports/signals/signal_515180_rsi30_bounce_YYYYMMDD_*.txt` |
+| ETFTracker-159545 | `reports/signals/signal_159545_macd_golden_YYYYMMDD_*.txt` |
+| GrowthBoardRank | `reports/rankings/growth_board_rank_YYYYMMDD_*.txt` |
 
 ## Manual Trigger
 User can also say: **"查一下定时任务结果"** and Claw should run the same check.

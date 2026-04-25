@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Claw 定时任务结果查询器.
 
-读取 logs/ 目录，汇总和展示定时任务的执行结果.
+读取 reports/ 目录，汇总和展示定时任务的执行结果.
 Claw 被唤醒时调用，方便用户查看报告.
 
 Usage:
@@ -26,7 +26,8 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 ROOT = str(Path(__file__).resolve().parent.parent)
-LOGS_DIR = Path(ROOT) / "logs"
+REPORTS_DIR = Path(ROOT) / "reports"
+LOGS_DIR = Path(ROOT) / "logs"  # backward compatibility
 
 # 任务名称到文件前缀的映射（支持模糊匹配）
 TASK_PREFIXES = {
@@ -53,45 +54,55 @@ def _find_files(
     since: Optional[date] = None,
     until: Optional[date] = None,
 ) -> list[Path]:
-    """Find report files matching criteria."""
-    if not LOGS_DIR.exists():
+    """Find report files matching criteria in reports/ and legacy logs/."""
+    candidates = []
+
+    # Search reports/ subdirectories
+    search_dirs = []
+    if REPORTS_DIR.exists():
+        search_dirs.extend([d for d in REPORTS_DIR.iterdir() if d.is_dir()])
+    # Also check legacy logs/
+    if LOGS_DIR.exists():
+        search_dirs.append(LOGS_DIR)
+
+    if not search_dirs:
         return []
 
-    candidates = []
-    for f in LOGS_DIR.iterdir():
-        if not f.is_file() or not f.suffix == ".txt":
-            continue
+    for directory in search_dirs:
+        for f in directory.iterdir():
+            if not f.is_file() or not f.suffix == ".txt":
+                continue
 
-        # Try to extract date from filename (common patterns)
-        # Patterns: tracker_515180_20260425_183012.txt, growth_board_rank_20260425_190000.txt
-        m = re.search(r"_(\d{8})_\d{6}\.txt$", f.name)
-        if m:
-            file_date = datetime.strptime(m.group(1), "%Y%m%d").date()
-        else:
-            # Fallback to modification time
-            file_date = datetime.fromtimestamp(f.stat().st_mtime).date()
+            # Try to extract date from filename (common patterns)
+            # Patterns: tracker_515180_20260425_183012.txt, growth_board_rank_20260425_190000.txt
+            m = re.search(r"_(\d{8})_\d{6}\.txt$", f.name)
+            if m:
+                file_date = datetime.strptime(m.group(1), "%Y%m%d").date()
+            else:
+                # Fallback to modification time
+                file_date = datetime.fromtimestamp(f.stat().st_mtime).date()
 
-        if since and file_date < since:
-            continue
-        if until and file_date > until:
-            continue
+            if since and file_date < since:
+                continue
+            if until and file_date > until:
+                continue
 
-        # Task filter
-        if task_hint:
-            hint_lower = task_hint.lower().replace("-", "").replace("_", "")
-            matched = False
-            for key, prefixes in TASK_PREFIXES.items():
-                key_clean = key.lower().replace("-", "").replace("_", "")
-                if hint_lower in key_clean or key_clean in hint_lower:
-                    if any(f.name.startswith(p) for p in prefixes):
-                        matched = True
-                        break
-            if not matched:
-                # Also try direct substring match on filename
-                if hint_lower not in f.name.lower().replace("-", "").replace("_", ""):
-                    continue
+            # Task filter
+            if task_hint:
+                hint_lower = task_hint.lower().replace("-", "").replace("_", "")
+                matched = False
+                for key, prefixes in TASK_PREFIXES.items():
+                    key_clean = key.lower().replace("-", "").replace("_", "")
+                    if hint_lower in key_clean or key_clean in hint_lower:
+                        if any(f.name.startswith(p) for p in prefixes):
+                            matched = True
+                            break
+                if not matched:
+                    # Also try direct substring match on filename
+                    if hint_lower not in f.name.lower().replace("-", "").replace("_", ""):
+                        continue
 
-        candidates.append(f)
+            candidates.append(f)
 
     # Sort by modification time descending
     candidates.sort(key=lambda p: p.stat().st_mtime, reverse=True)

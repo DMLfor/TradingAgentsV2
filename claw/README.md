@@ -107,7 +107,7 @@ tdx signal -c 159545 -s macd_golden --save
 tdx rank --bars 120 --top 100 --save
 ```
 
-报告会自动保存到 `logs/` 目录。
+报告会自动保存到 `reports/` 目录。
 
 ## 常见问题
 
@@ -117,7 +117,7 @@ tdx rank --bars 120 --top 100 --save
 2. 导航到 `Task Scheduler Library > TradingAgentsV2`
 3. 检查任务状态是否为 "Ready"
 4. 右键任务 → "Run" 手动测试
-5. 查看 `logs/` 目录是否有新文件生成
+5. 查看 `reports/` 目录是否有新文件生成
 
 ### 想改执行时间？
 
@@ -132,7 +132,7 @@ tdx rank --bars 120 --top 100 --save
 
 ### 报告在哪里？
 
-所有报告保存在项目根目录的 `logs/` 下，按日期自动归档。文件名格式：
+所有报告保存在项目根目录的 `reports/` 下，按类型分子目录。文件名格式：
 - `signal_515180_rsi30_bounce_20260425_090000.txt`
 - `signal_159545_macd_golden_20260425_090500.txt`
 - `growth_board_rank_20260425_190000.txt`

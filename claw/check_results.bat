@@ -20,4 +20,4 @@ echo.
 echo   -- GrowthBoardRank:
 python scripts/claw_check.py --task GrowthBoardRank --today 2>nul || echo      (no recent report)
 echo.
-echo === Check complete. Logs dir: %CD%\logs ===
+echo === Check complete. Reports dir: %CD%\reports ===

@@ -225,7 +225,7 @@ def main():
     parser.add_argument("--level2", help="Override universe level2 industry")
     parser.add_argument("--codes", help="Override universe with comma-separated codes")
     parser.add_argument("--workers", type=int, default=8, help="Parallel workers for data loading (default: 8)")
-    parser.add_argument("--save", action="store_true", help="Save report to logs/")
+    parser.add_argument("--save", action="store_true", help="Save report to reports/backtests/")
     parser.add_argument("--export-trades", action="store_true", help="导出交易明细到 CSV")
     parser.add_argument("--export-nav", action="store_true", help="导出资金曲线到 CSV")
     parser.add_argument("--benchmark", help="基准指数代码 (如 000300 沪深300, 399006 创业板指)")
@@ -248,8 +248,8 @@ def main():
 
     # Save
     if args.save:
-        log_dir = Path(ROOT) / "logs"
-        log_dir.mkdir(exist_ok=True)
+        log_dir = Path(ROOT) / "reports" / "backtests"
+        log_dir.mkdir(parents=True, exist_ok=True)
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         safe_name = config.name.replace(" ", "_").replace("/", "_")
 
@@ -265,8 +265,8 @@ def main():
         print(f"[已保存指标] {metrics_path}")
 
     if args.export_trades:
-        log_dir = Path(ROOT) / "logs"
-        log_dir.mkdir(exist_ok=True)
+        log_dir = Path(ROOT) / "reports" / "backtests"
+        log_dir.mkdir(parents=True, exist_ok=True)
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         safe_name = config.name.replace(" ", "_").replace("/", "_")
         trades_path = log_dir / f"bt_{safe_name}_{ts}_trades.csv"
@@ -274,8 +274,8 @@ def main():
         print(f"[已保存交易明细] {trades_path}")
 
     if args.export_nav:
-        log_dir = Path(ROOT) / "logs"
-        log_dir.mkdir(exist_ok=True)
+        log_dir = Path(ROOT) / "reports" / "backtests"
+        log_dir.mkdir(parents=True, exist_ok=True)
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         safe_name = config.name.replace(" ", "_").replace("/", "_")
         nav_path = log_dir / f"bt_{safe_name}_{ts}_nav.csv"

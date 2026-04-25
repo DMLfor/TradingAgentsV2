@@ -176,8 +176,8 @@ def build_report(code: str, strategy: str, params: dict, save: bool) -> str:
     print(text)
 
     if save:
-        out_dir = Path(ROOT) / "logs"
-        out_dir.mkdir(exist_ok=True)
+        out_dir = Path(ROOT) / "reports" / "signals"
+        out_dir.mkdir(parents=True, exist_ok=True)
         fname = f"signal_{code}_{strategy}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         out_path = out_dir / fname
         out_path.write_text(text, encoding="utf-8")
@@ -194,7 +194,7 @@ def main():
                         help="Strategy name")
     parser.add_argument("--rsi-buy", type=float, default=30, help="RSI buy threshold")
     parser.add_argument("--rsi-sell", type=float, default=70, help="RSI sell threshold")
-    parser.add_argument("--save", action="store_true", help="Save report to logs/")
+    parser.add_argument("--save", action="store_true", help="Save report to reports/signals/")
     args = parser.parse_args()
 
     params = {}

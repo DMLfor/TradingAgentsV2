@@ -105,11 +105,11 @@ tdx rank --bars 120 --top 100 --save
 ### 查看报告
 
 ```bash
-# 列出 logs/ 目录下今天的所有报告
-ls -lt logs/ | head -20
+# 列出 reports/ 目录下今天的所有报告
+find reports/ -type f -name "*$(date +%Y%m%d)*" | sort
 
 # 查看指定报告内容
-cat logs/signal_515180_rsi30_bounce_*.txt
+cat reports/signals/signal_515180_rsi30_bounce_*.txt
 ```
 
 ---
@@ -126,8 +126,8 @@ tdx task list
 tdx task check --today
 
 # 3. 查看最新信号
-ls -lt logs/signal_515180_*.txt | head -1 | xargs cat
-ls -lt logs/signal_159545_*.txt | head -1 | xargs cat
+ls -lt reports/signals/signal_515180_*.txt | head -1 | xargs cat
+ls -lt reports/signals/signal_159545_*.txt | head -1 | xargs cat
 ```
 
 **汇报规则**：
@@ -162,10 +162,10 @@ A: 正常。首次会解压 `data/tdx_data_cloud.db.gz`（45MB → 241MB），�
 A: 云端只保留 sz + sh 近1年数据。如需全量数据，请在本地 Windows 机器重新导出并上传。
 
 ### Q: 报告保存在哪里？
-A: `logs/` 目录下，文件名格式：
-- `signal_515180_rsi30_bounce_YYYYMMDD_HHMMSS.txt`
-- `signal_159545_macd_golden_YYYYMMDD_HHMMSS.txt`
-- `growth_board_rank_YYYYMMDD_HHMMSS.txt`
+A: `reports/` 目录下，按类型分子目录：
+- `reports/signals/signal_515180_rsi30_bounce_YYYYMMDD_HHMMSS.txt`
+- `reports/signals/signal_159545_macd_golden_YYYYMMDD_HHMMSS.txt`
+- `reports/rankings/growth_board_rank_YYYYMMDD_HHMMSS.txt`
 
 ### Q: 如何更新云端数据？
 A: 在本地运行 `python scripts/export_cloud_sqlite.py`，生成新的 `.gz`，重新 push 到 GitHub，Claw 重新 clone。

@@ -211,7 +211,7 @@ def main():
     parser = argparse.ArgumentParser(description="创业板全量股票技术分析排名")
     parser.add_argument("--bars", type=int, default=BARS_DEFAULT, help="分析窗口天数 (default: 120)")
     parser.add_argument("--top", type=int, default=TOP_N_DEFAULT, help="输出Top N (default: 100)")
-    parser.add_argument("--save", action="store_true", help="保存结果到 logs/")
+    parser.add_argument("--save", action="store_true", help="保存结果到 reports/rankings/")
     args = parser.parse_args()
 
     # Get all 创业板 codes
@@ -240,8 +240,8 @@ def main():
 
     # Save
     if args.save:
-        out_dir = Path(ROOT) / "logs"
-        out_dir.mkdir(exist_ok=True)
+        out_dir = Path(ROOT) / "reports" / "rankings"
+        out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / f"growth_board_rank_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         out_path.write_text(text, encoding="utf-8")
         print(f"\n[Saved] {out_path}")

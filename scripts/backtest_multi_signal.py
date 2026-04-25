@@ -336,8 +336,8 @@ def main():
             report = print_report(args.code, "RSI30", single_trades, combo_trades)
 
     if args.save:
-        out_dir = Path(ROOT) / "logs"
-        out_dir.mkdir(exist_ok=True)
+        out_dir = Path(ROOT) / "reports" / "backtests"
+        out_dir.mkdir(parents=True, exist_ok=True)
         fname = f"backtest_multi_{args.code}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         (out_dir / fname).write_text(report, encoding="utf-8")
         print(f"\n[Saved] {out_dir / fname}")

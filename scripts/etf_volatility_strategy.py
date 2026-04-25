@@ -196,8 +196,8 @@ def analyze_etf(code: str, bars: int, grid_count: int, step_mult: float,
     print(text)
 
     if save:
-        out_dir = Path(ROOT) / "logs"
-        out_dir.mkdir(exist_ok=True)
+        out_dir = Path(ROOT) / "reports" / "etf"
+        out_dir.mkdir(parents=True, exist_ok=True)
         fname = f"etf_grid_{code}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         out_path = out_dir / fname
         out_path.write_text(text, encoding="utf-8")
@@ -270,7 +270,7 @@ def main():
     parser.add_argument("--step", type=float, default=0.8, help="Grid step = ATR * step (default: 0.8)")
     parser.add_argument("--rsi-buy", type=float, default=35.0, help="RSI oversold threshold (default: 35)")
     parser.add_argument("--rsi-sell", type=float, default=65.0, help="RSI overbought threshold (default: 65)")
-    parser.add_argument("--save", action="store_true", help="Save report to logs/")
+    parser.add_argument("--save", action="store_true", help="Save report to reports/etf/")
     args = parser.parse_args()
 
     analyze_etf(
