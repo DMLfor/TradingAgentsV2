@@ -51,6 +51,24 @@ class TdxConfig:
         "minline": ("minute_1",  "lc1", "tdx_minute_1",  "minute"),
     })
 
+    @staticmethod
+    def _load_dotenv() -> None:
+        """Load .env file into os.environ (if exists)."""
+        env_path = Path(__file__).parent.parent / ".env"
+        if not env_path.exists():
+            return
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" not in line:
+                continue
+            key, val = line.split("=", 1)
+            key = key.strip()
+            val = val.strip().strip('"').strip("'")
+            if key:
+                os.environ.setdefault(key, val)
+
     def __post_init__(self):
         """Auto-detect cloud SQLite and switch db_type accordingly.
 
@@ -58,6 +76,9 @@ class TdxConfig:
         override db_type to sqlite regardless of YAML config.
         Local env without these files continues to use MySQL.
         """
+        # Load .env first so os.getenv can pick it up
+        self._load_dotenv()
+
         cloud_db = Path(__file__).parent.parent / "data" / "tdx_data_cloud.db"
         cloud_db_gz = cloud_db.with_suffix(".db.gz")
         if cloud_db.exists() or cloud_db_gz.exists():
