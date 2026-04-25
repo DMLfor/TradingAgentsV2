@@ -17,7 +17,7 @@ class TdxConfig:
     mysql_host: str = "127.0.0.1"
     mysql_port: int = 3306
     mysql_user: str = "root"
-    mysql_password: str = "tdx123456"
+    mysql_password: str = ""
     mysql_database: str = "tdx_data"
 
     batch_size: int = 5000
@@ -36,12 +36,35 @@ class TdxConfig:
     smtp_password: str = ""
     notify_email: str = ""
 
+    # Metadata files
+    metadata_path: str = "config/stock_metadata.json"
+    names_path: str = "config/stock_names.json"
+    metadata_source: str = ""  # CSV source path (for generation tracking)
+
     # 目录映射：子目录名 → (数据类型, 文件后缀, 目标表, reader方法)
     DATA_TYPE_MAP: Dict = field(default_factory=lambda: {
         "lday":    ("daily",     "day", "tdx_daily",     "daily"),
         "fzline":  ("minute_5",  "lc5", "tdx_minute_5",  "fzline"),
         "minline": ("minute_1",  "lc1", "tdx_minute_1",  "minute"),
     })
+
+    def __post_init__(self):
+        """Auto-detect cloud SQLite and switch db_type accordingly.
+
+        If data/tdx_data_cloud.db or .db.gz exists (e.g. OpenClaw cloud env),
+        override db_type to sqlite regardless of YAML config.
+        Local env without these files continues to use MySQL.
+        """
+        cloud_db = Path(__file__).parent.parent / "data" / "tdx_data_cloud.db"
+        cloud_db_gz = cloud_db.with_suffix(".db.gz")
+        if cloud_db.exists() or cloud_db_gz.exists():
+            self.db_type = "sqlite"
+            self.db_path = str(cloud_db)
+        # Allow env override for sensitive fields
+        if os.getenv("MYSQL_PASSWORD"):
+            self.mysql_password = os.getenv("MYSQL_PASSWORD")
+        if os.getenv("TDX_DB_PATH"):
+            self.db_path = os.getenv("TDX_DB_PATH")
 
     @property
     def vipdoc_dir(self) -> Path:

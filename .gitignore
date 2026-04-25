@@ -1,5 +1,7 @@
-# Database files
+# Database files (local large DBs)
 *.db
+# But keep the compressed cloud DB for GitHub upload
+!data/tdx_data_cloud.db.gz
 
 # Python
 __pycache__/
@@ -20,3 +22,11 @@ htmlcov/
 
 # Logs
 logs/
+
+# Local environment & IDE
+.env
+.claude/
+claw_ready/
+
+# Local config (contains real passwords)
+config/tdx_config.yaml

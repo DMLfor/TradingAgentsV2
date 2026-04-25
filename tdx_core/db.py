@@ -39,7 +39,17 @@ class TdxDatabase:
             )
         else:
             import sqlite3
-            conn = sqlite3.connect(self.config.db_path)
+            db_path = Path(self.config.db_path)
+            # Auto-decompress .db.gz if .db is missing (first run in cloud)
+            if not db_path.exists():
+                gz_path = db_path.with_suffix(".db.gz")
+                if gz_path.exists():
+                    import gzip
+                    logger.info("[SQLite] Decompressing %s -> %s", gz_path, db_path)
+                    with gzip.open(gz_path, "rb") as f_in, open(db_path, "wb") as f_out:
+                        f_out.write(f_in.read())
+                    logger.info("[SQLite] Decompress done")
+            conn = sqlite3.connect(str(db_path))
             conn.execute("PRAGMA journal_mode=WAL")
             conn.execute("PRAGMA synchronous=NORMAL")
             return conn

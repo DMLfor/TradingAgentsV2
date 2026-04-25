@@ -35,7 +35,7 @@ TradingAgentsV2/
 在项目根目录执行：
 
 ```bash
-pip install -e .
+py -3.13 -m pip install -e .
 ```
 
 这会将 `tdx_core` 以开发模式安装，之后在任何目录都能直接 `import`。
@@ -84,7 +84,7 @@ with TdxQuery() as q:
 ### 方法 A：pip install -e（推荐）
 
 ```bash
-pip install -e C:\Users\dblank\code\TradingAgentsV2
+py -3.13 -m pip install -e /path/to/TradingAgentsV2
 ```
 
 之后在任意 Python 环境中：
@@ -100,7 +100,7 @@ df = q.get_daily("000001")
 
 ```python
 import sys
-sys.path.insert(0, r"C:\Users\dblank\code\TradingAgentsV2")
+sys.path.insert(0, r"/path/to/TradingAgentsV2")
 from tdx_core import TdxQuery
 ```
 
@@ -108,7 +108,7 @@ from tdx_core import TdxQuery
 
 ```bash
 # Windows
-set PYTHONPATH=C:\Users\dblank\code\TradingAgentsV2
+set PYTHONPATH=C:\path\to\TradingAgentsV2
 
 # Linux/Mac
 export PYTHONPATH=/path/to/TradingAgentsV2
@@ -160,13 +160,13 @@ q = TdxQuery(yaml_path="path/to/my_config.yaml")
 
 ```bash
 # 初始化表结构
-python scripts/tdx_init_db.py
+py -3.13 scripts/tdx_init_db.py
 
 # 全量导入
-python scripts/tdx_full_import.py
+py -3.13 scripts/tdx_full_import.py
 
 # 增量同步
-python scripts/tdx_sync.py
+py -3.13 scripts/tdx_sync.py
 ```
 
 ## 示例
@@ -177,6 +177,64 @@ python -m examples.02_custom_config     # 自定义配置
 python -m examples.03_as_external_package  # 外部包调用
 python -m examples.04_custom_sql        # 自定义 SQL
 ```
+
+## 云端运行（OpenClaw / GitHub Actions）
+
+项目支持无 MySQL 的云端运行模式。仓库已内置压缩的 SQLite 数据包，首次运行自动解压。
+
+```bash
+# 克隆后直接运行，无需配置 MySQL
+git clone https://github.com/yourname/TradingAgentsV2.git
+cd TradingAgentsV2
+pip install -e .
+
+# 任意 tdx 命令会自动检测云端 SQLite 并解压
+tdx signal -c 515180 -s rsi30_bounce
+tdx rank --top 10
+```
+
+**原理**：
+- `data/tdx_data_cloud.db.gz`（~45MB，sz+sh 近1年日线）
+- 首次运行时自动解压为 `data/tdx_data_cloud.db`
+- `tdx_core/config.py` 的 `__post_init__` 检测到 `.db/.gz` 存在即自动切换 SQLite 模式
+- 本地无该文件时继续走 MySQL（零配置改动）
+
+**重新导出云端数据**（本地执行）：
+```bash
+python scripts/export_cloud_sqlite.py
+```
+
+---
+
+## 统一 CLI
+
+安装后全局可用 `tdx` 命令：
+
+```bash
+# 信号跟踪
+tdx signal -c 515180 -s rsi30_bounce --save
+
+# 全量技术分析（37指标）
+tdx analyze -c 688018 -b 120 --save
+
+# 板块排名
+tdx rank --top 100 --save
+
+# 市场扫描
+tdx scan -c 000001,000002 -i macd -s golden_cross --save
+
+# 策略回测
+tdx backtest -s strategies/515180_rsi30_bounce.json --codes 515180 --save
+
+# 数据同步（本地 MySQL）
+tdx sync
+
+# 定时任务管理
+tdx task list
+tdx task check --today
+```
+
+---
 
 ## 数据库表结构
 
