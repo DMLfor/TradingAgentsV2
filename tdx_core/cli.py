@@ -272,12 +272,13 @@ def export(output: str, skip_verify: bool):
 @click.option("--watchlist", help="代码列表文件路径")
 @click.option("--all-shsz", is_flag=True, help="同步本地数据库中全部沪深代码")
 @click.option("--etf-only", is_flag=True, help="仅同步 ETF")
+@click.option("--mode", default="daily", help="daily=rt_k_ms, intraday=rt_min_daily聚合")
 @click.option("--dry-run", is_flag=True, help="预览不写入")
 @click.option("--verbose", "-v", is_flag=True, help="详细日志")
 def sync_api(codes: str | None, watchlist: str | None, all_shsz: bool,
-             etf_only: bool, dry_run: bool, verbose: bool):
-    """从 minishare API 同步实时日线到本地数据库."""
-    args = []
+             etf_only: bool, mode: str, dry_run: bool, verbose: bool):
+    """从 minishare API 同步实时数据到本地数据库."""
+    args = ["--mode", mode]
     if codes:
         args.extend(["--codes", codes])
     if watchlist:

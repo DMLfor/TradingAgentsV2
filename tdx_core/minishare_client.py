@@ -126,6 +126,65 @@ class MinishareClient:
             limit=_API_BATCH_LIMIT,
         )
 
+    def get_intraday_snapshot(self, codes: List[str]) -> pd.DataFrame:
+        """通过 rt_min_daily 分钟线聚合成当日日线.
+
+        适用于仅有 rt_min 权限的 token，将当日分钟线聚合成
+        open/high/low/close/volume/amount 日线格式后写入数据库。
+
+        Args:
+            codes: 6 位纯数字代码列表
+        Returns:
+            标准化 DataFrame，列名与本地数据库对齐。
+        """
+        if not codes:
+            return pd.DataFrame(columns=_DB_COLUMNS)
+
+        results: List[pd.DataFrame] = []
+        for code in codes:
+            ts_code = self._to_ts_code(code)
+            try:
+                df_min = self._call_with_retry("rt_min_daily", ts_code=ts_code)
+            except MinishareError as exc:
+                logger.warning("[%s] rt_min_daily 失败: %s", code, exc)
+                continue
+
+            if df_min is None or df_min.empty:
+                continue
+
+            # Aggregate minute bars → daily bar
+            daily = self._aggregate_minute_to_daily(df_min, code)
+            if daily is not None:
+                results.append(daily)
+
+        if not results:
+            return pd.DataFrame(columns=_DB_COLUMNS)
+
+        return pd.concat(results, ignore_index=True)
+
+    @staticmethod
+    def _aggregate_minute_to_daily(df_min: pd.DataFrame, code: str) -> Optional[pd.DataFrame]:
+        """将一只股票的分钟线 DataFrame 聚合成单条日线."""
+        df = df_min.copy()
+        for col in ["open", "high", "low", "close", "vol", "amount"]:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        if df.empty or df["open"].isna().all():
+            return None
+
+        today = date.today().strftime("%Y-%m-%d")
+        return pd.DataFrame([{
+            "code": code,
+            "trade_date": today,
+            "open_val": float(df["open"].iloc[0]),
+            "high_val": float(df["high"].max()),
+            "low_val": float(df["low"].min()),
+            "close_val": float(df["close"].iloc[-1]),
+            "volume": int(df["vol"].sum()),
+            "amount": float(df["amount"].sum()),
+        }])
+
     # ─── 内部方法 ─────────────────────────────────────────────────────────────
 
     def _fetch_batch(

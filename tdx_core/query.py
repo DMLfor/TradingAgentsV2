@@ -146,11 +146,12 @@ class TdxQuery:
 
     # ─── 生命周期 ───
 
-    def refresh_live(self, codes: List[str]) -> int:
-        """从 minishare API 拉取实时快照并写入本地数据库.
+    def refresh_live(self, codes: List[str], mode: str = "daily") -> int:
+        """从 minishare API 拉取实时数据并写入本地数据库.
 
         Args:
             codes: 6 位纯数字代码列表
+            mode: "daily" 使用 rt_k_ms 日线快照(需权限), "intraday" 使用 rt_min_daily 分钟线聚合
         Returns:
             成功写入的行数
         """
@@ -160,40 +161,50 @@ class TdxQuery:
 
         import pandas as pd
         all_dfs = []
-        classified = {"stock": [], "etf": [], "index": []}
-        index_codes = {"000001", "000002", "000003", "000004",
-                       "399001", "399005", "399006", "399300", "000688"}
-        for code in codes:
-            if code in index_codes:
-                classified["index"].append(code)
-            elif code.startswith(("5", "15", "16")):
-                classified["etf"].append(code)
-            else:
-                classified["stock"].append(code)
 
-        for code_type, type_codes in classified.items():
-            if not type_codes:
-                continue
+        if mode == "intraday":
+            # rt_min_daily 聚合模式，直接传全部代码
             try:
-                if code_type == "stock":
-                    df = self._ms_client.get_snapshot(type_codes)
-                elif code_type == "etf":
-                    df = self._ms_client.get_etf_snapshot(type_codes)
-                elif code_type == "index":
-                    df = self._ms_client.get_index_snapshot(type_codes)
-                else:
-                    continue
+                df = self._ms_client.get_intraday_snapshot(codes)
                 if df is not None and not df.empty:
                     all_dfs.append(df)
             except MinishareError as exc:
-                logger.error("refresh_live [%s] 失败: %s", code_type, exc)
+                logger.error("refresh_live [intraday] 失败: %s", exc)
+        else:
+            classified = {"stock": [], "etf": [], "index": []}
+            index_codes = {"000001", "000002", "000003", "000004",
+                           "399001", "399005", "399006", "399300", "000688"}
+            for code in codes:
+                if code in index_codes:
+                    classified["index"].append(code)
+                elif code.startswith(("5", "15", "16")):
+                    classified["etf"].append(code)
+                else:
+                    classified["stock"].append(code)
+
+            for code_type, type_codes in classified.items():
+                if not type_codes:
+                    continue
+                try:
+                    if code_type == "stock":
+                        df = self._ms_client.get_snapshot(type_codes)
+                    elif code_type == "etf":
+                        df = self._ms_client.get_etf_snapshot(type_codes)
+                    elif code_type == "index":
+                        df = self._ms_client.get_index_snapshot(type_codes)
+                    else:
+                        continue
+                    if df is not None and not df.empty:
+                        all_dfs.append(df)
+                except MinishareError as exc:
+                    logger.error("refresh_live [%s] 失败: %s", code_type, exc)
 
         if not all_dfs:
             return 0
 
         combined = pd.concat(all_dfs, ignore_index=True)
         rows = self.db.upsert_dataframe(combined, "tdx_daily")
-        logger.info("refresh_live: %d 行数据已更新到数据库", rows)
+        logger.info("refresh_live: %d 行数据已更新到数据库 (mode=%s)", rows, mode)
         return rows
 
     def close(self):

@@ -125,6 +125,8 @@ def main():
     parser.add_argument("--all-shsz", action="store_true",
                         help="同步本地数据库中已有的全部沪深代码（注意 API 限额）")
     parser.add_argument("--etf-only", action="store_true", help="仅同步 ETF")
+    parser.add_argument("--mode", choices=["daily", "intraday"], default="daily",
+                        help="同步模式: daily=rt_k_ms 日线快照(需权限), intraday=rt_min_daily 分钟线聚合(默认)")
     parser.add_argument("--dry-run", action="store_true",
                         help="预览数据，不写入数据库")
     parser.add_argument("--verbose", "-v", action="store_true", help="详细日志")
@@ -178,10 +180,16 @@ def main():
             continue
         if not type_codes:
             continue
-        df = _fetch_and_normalize(client, type_codes, code_type)
+
+        if args.mode == "intraday":
+            # Use rt_min_daily aggregation (works with rt_min permission)
+            df = client.get_intraday_snapshot(type_codes)
+        else:
+            df = _fetch_and_normalize(client, type_codes, code_type)
+
         if df is not None and not df.empty:
             all_dfs.append(df)
-            logger.info("[%s] 成功拉取 %d 行", code_type, len(df))
+            logger.info("[%s] 成功拉取 %d 行 (mode=%s)", code_type, len(df), args.mode)
 
     if not all_dfs:
         print("没有拉取到任何数据", file=sys.stderr)
