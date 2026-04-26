@@ -25,9 +25,27 @@ logs/
 
 # Local environment & IDE
 .env
+.env~
+..env.un~
 .claude/
 claw_ready/
 .kimi/
+
+# Vim backups
+*~
+
+# Temp files
+.tmp/
+tmp/
+
+# Runtime cache
+data/llm_cache.json
+
+# Reference projects (not part of this repo)
+ai-hedge-fund/
+
+# User data (generated at runtime)
+config/watchlist.json
 
 # Local config (contains real passwords)
 config/tdx_config.yaml

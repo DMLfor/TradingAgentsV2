@@ -114,14 +114,22 @@ scripts/                         # CLI scripts (canonical source)
     watchlist_manager.py         # Stock watchlist CRUD (add/remove/list/clear/pools)
     watchlist_scan.py            # Daily technical scan for watchlist stocks
     watchlist_review.py          # Daily review for watchlist stocks (signals + action plan)
+  Agent Analysis (1):
+    agent_analyze.py             # Multi-agent parallel analysis (LangGraph): 5 persona specialists + risk_manager + portfolio_manager
 
 tdx_core/                        # Python package
-  cli.py                         # Unified CLI entry (Click, 14 subcommands incl. pick, review)
+  cli.py                         # Unified CLI entry (Click, 15 subcommands incl. pick, review, agent)
   backtest/                      # Backtest engine, portfolio sim, metrics
   indicators/                    # 37 technical indicators
   analyzer.py                    # Signal detection, single-signal backtest
   query.py                       # Database query interface
   metadata.py                    # Stock screening API
+  agent/                         # Agent analysis module (LangGraph workflow)
+    graph/                       # StateGraph, AgentState, workflow builder
+    agents/                      # 5 specialist persona agents + risk_manager + portfolio_manager
+    data_helper.py               # TdxQuery wrapper for agents
+    llm_client.py                # OpenAI-compatible LLM client (Kimi/Moonshot)
+    base.py                      # Pydantic models: AgentSignal, CompositeResult
 
 config/
   stock_metadata.json            # 5516 stocks with industry/board index
@@ -166,6 +174,10 @@ tdx task reload
 # 形态选股
 tdx pick --board 创业板 --min-score 55 --top 20 --save
 tdx pick --codes 300750,300059 --min-score 55
+
+# Agent 多维度分析
+tdx agent -c 688018 --bars 120 --save
+tdx agent -c 515180 --no-llm --show-reasoning
 
 # 辅助
 tdx list-indicators

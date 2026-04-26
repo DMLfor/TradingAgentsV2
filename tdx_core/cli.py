@@ -423,6 +423,33 @@ def watchlist_review(pool: str, date: str | None, save: bool):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# agent — 多维度 Agent 分析
+# ═══════════════════════════════════════════════════════════════════════════
+
+@cli.command()
+@click.option("--code", "-c", required=True, help="股票代码，如 688018")
+@click.option("--bars", "-b", default=120, help="分析窗口天数")
+@click.option("--save", is_flag=True, help="保存报告到 results/analysis/")
+@click.option("--no-llm", is_flag=True, help="禁用 LLM，使用纯算法综合")
+@click.option("--model", default=None, help="LLM 模型名称，如 kimi-2.6, moonshot-v1-8k")
+def agent(code: str, bars: int, save: bool, no_llm: bool, model: str | None):
+    """多维度 Agent 并行技术分析（趋势/均值回归/动量/波动率/量价 + 风控 + 投资总监综合）."""
+    sys.path.insert(0, str(ROOT))
+    from scripts.agent_analyze import main as agent_main
+
+    # Patch sys.argv for argparse
+    args = [code, "--bars", str(bars)]
+    if save:
+        args.append("--save")
+    if no_llm:
+        args.append("--no-llm")
+    if model:
+        args.extend(["--model", model])
+    sys.argv = ["agent_analyze.py"] + args
+    agent_main()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # list-indicators / list-strategies
 # ═══════════════════════════════════════════════════════════════════════════
 
