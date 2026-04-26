@@ -38,6 +38,7 @@ from .metadata import (
     list_boards,
     sector_stats,
 )
+from .watchlist import WatchlistManager
 
 __all__ = [
     "TdxConfig",

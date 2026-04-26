@@ -110,6 +110,9 @@ scripts/                         # CLI scripts (canonical source)
     baseline_screener.py         # Random-buy baseline comparison
   Daily Market Review (1):
     daily_market_review.py       # Daily technical review: market/style/sector/sentiment/trend/volume-price/outlook/ETF/signals/picks/plan
+  Watchlist (2):
+    watchlist_manager.py         # Stock watchlist CRUD (add/remove/list/clear/pools)
+    watchlist_scan.py            # Daily technical scan for watchlist stocks
 
 tdx_core/                        # Python package
   cli.py                         # Unified CLI entry (Click, 14 subcommands incl. pick, review)

@@ -350,6 +350,65 @@ def review(date: str | None, board: str | None, min_score: int, top_n: int, save
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# watchlist — 关注池管理
+# ═══════════════════════════════════════════════════════════════════════════
+
+@cli.group()
+def watchlist():
+    """股票关注池管理 — 添加/删除/列出/扫描."""
+
+
+@watchlist.command()
+@click.argument("codes")
+@click.option("--pool", default="default", help="目标池名称")
+def add(codes: str, pool: str):
+    """添加股票到关注池. 示例: tdx watchlist add 000001,600519 --pool default"""
+    _run_script("watchlist_manager.py", ["add", codes, "--pool", pool])
+
+
+@watchlist.command()
+@click.argument("codes")
+@click.option("--pool", default="default", help="目标池名称")
+def remove(codes: str, pool: str):
+    """从关注池删除股票."""
+    _run_script("watchlist_manager.py", ["remove", codes, "--pool", pool])
+
+
+@watchlist.command()
+@click.option("--pool", default="default", help="目标池名称")
+def list(pool: str):
+    """列出关注池股票（带板块/行业信息）."""
+    _run_script("watchlist_manager.py", ["list", "--pool", pool])
+
+
+@watchlist.command()
+@click.option("--pool", default="default", help="目标池名称")
+def clear(pool: str):
+    """清空关注池."""
+    _run_script("watchlist_manager.py", ["clear", "--pool", pool])
+
+
+@watchlist.command()
+def pools():
+    """列出所有关注池."""
+    _run_script("watchlist_manager.py", ["pools"])
+
+
+@watchlist.command()
+@click.option("--pool", default="default", help="目标池名称")
+@click.option("--date", help="扫描日期 YYYY-MM-DD")
+@click.option("--save", is_flag=True, help="保存报告")
+def scan(pool: str, date: str | None, save: bool):
+    """对关注池进行每日技术面扫描."""
+    args = ["--pool", pool]
+    if date:
+        args.extend(["--date", date])
+    if save:
+        args.append("--save")
+    _run_script("watchlist_scan.py", args)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # list-indicators / list-strategies
 # ═══════════════════════════════════════════════════════════════════════════
 
