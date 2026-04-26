@@ -44,6 +44,16 @@ tasks:
       days: [Mon, Tue, Wed, Thu, Fri]
     enabled: false
 
+  - name: WatchlistReview-default
+    description: "关注池每日复盘 — default"
+    command: 'tdx watchlist review --pool default --save'
+    workdir: "{root}"
+    schedule:
+      type: daily
+      at: "20:00"
+      days: [Mon, Tue, Wed, Thu, Fri]
+    enabled: true
+
 settings:
   task_folder: "TradingAgentsV2"
   execution_time_limit: "PT30M"

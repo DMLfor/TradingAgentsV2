@@ -408,6 +408,20 @@ def scan(pool: str, date: str | None, save: bool):
     _run_script("watchlist_scan.py", args)
 
 
+@watchlist.command("review")
+@click.option("--pool", default="default", help="目标池名称")
+@click.option("--date", help="复盘日期 YYYY-MM-DD")
+@click.option("--save", is_flag=True, help="保存报告")
+def watchlist_review(pool: str, date: str | None, save: bool):
+    """对关注池进行每日复盘（技术面+信号+操作建议）."""
+    args = ["--pool", pool]
+    if date:
+        args.extend(["--date", date])
+    if save:
+        args.append("--save")
+    _run_script("watchlist_review.py", args)
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # list-indicators / list-strategies
 # ═══════════════════════════════════════════════════════════════════════════
