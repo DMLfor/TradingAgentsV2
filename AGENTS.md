@@ -330,7 +330,7 @@ Baseline comparison: Random buy-hold on 创业板 = +0.60% avg, 50.3% win rate. 
 
 ## When Working on This Project
 
-1. **Ask "which layer?"** before adding a new script: Data Pipeline / Single Stock / Batch / ETF Strategy / Backtest / Pullback Screener
+1. **Ask "which layer?"** before adding a new script: Data Pipeline / Single Stock / Batch / ETF Strategy / Backtest / Pullback Screener / Daily Market Review
 2. **Test with real data** before claiming something works
 3. **Run `json.dumps(obj)`** after any `to_dict()` implementation
 4. **Output in Chinese** for all CLI-facing `print()` and reports
@@ -344,3 +344,4 @@ Baseline comparison: Random buy-hold on 创业板 = +0.60% avg, 50.3% win rate. 
 12. **Data anomaly filter**: In backtest, `abs(return_pct) > 1000` marks data_error and excludes from stats (e.g., 平安银行 2026-04-21 spurious 4085 price).
 13. **Ablation precompute**: `ablation_screener.py` builds a cache of 27,740 (stock × date) metric tuples first, then runs experiments in parallel. This avoids re-computing the same metrics 8 times.
 14. **Metadata export sync**: After `export_metadata.py`, copy `config/metadata_export/` to `claw_ready/config/metadata_export/` because `claw_ready/` is gitignored.
+15. **DO NOT DELETE `data/tdx_data_cloud.db.gz`**: This compressed SQLite DB is tracked by git and used for cloud deployment. It must remain in the repository. Do not add it to `.gitignore` and do not delete it.

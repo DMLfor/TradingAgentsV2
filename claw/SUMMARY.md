@@ -22,6 +22,7 @@
 | 1 | ETFTracker-515180 | 09:00 | 09:00 + 1~15min 随机偏移 | `tdx signal -c 515180 -s rsi30_bounce --save` | RSI30 反弹信号 |
 | 2 | ETFTracker-159545 | 09:00 | 09:00 + 1~15min 随机偏移 | `tdx signal -c 159545 -s macd_golden --save` | MACD 金叉信号 |
 | 3 | GrowthBoardRank | 19:00 | 19:00 (无偏移) | `tdx rank --bars 120 --top 100 --save` | 创业板全量排名 |
+| 4 | DailyMarketReview | 19:30 | 19:30 (无偏移) | `tdx review --save` | 每日技术复盘（大盘/板块/情绪/趋势/量价/前瞻/ETF/信号/选股/计划） |
 
 配置位置: `config/claw_tasks.yaml`
 注册命令: `tdx task register`
@@ -67,7 +68,8 @@ TradingAgentsV2/
 │   ├── technical_master.py       # 37指标全量分析
 │   ├── rank_growth_board.py      # 创业板排名
 │   ├── scan_market.py            # 市场扫描
-│   └── strategy_backtest.py      # 策略回测
+│   ├── strategy_backtest.py      # 策略回测
+│   └── daily_market_review.py    # 每日技术复盘（十一维报告）
 ├── strategies/                   # 策略 JSON 配置（24+ 种）
 │   └── 515180_rsi30_bounce.json  # 515180 最优策略
 ├── claw/
@@ -126,6 +128,10 @@ python scripts/technical_master.py 515180 --bars 60 --save
 
 # 创业板排名
 python scripts/rank_growth_board.py --bars 120 --top 100 --save
+
+# 每日技术复盘
+python scripts/daily_market_review.py --save
+python scripts/daily_market_review.py --date 2026-04-25 --save
 ```
 
 ### 策略回测
@@ -204,3 +210,7 @@ python scripts/batch_backtest.py
 | 2026-04-25 | `config/claw_tasks.yaml` | 修改 | 命令改为 `tdx signal ...` 形式 |
 | 2026-04-25 | `scripts/claw_register.py` | 修改 | `list` 显示实际注册时间（含 random_offset） |
 | 2026-04-25 | `scripts/claw_register.py` | 修改 | 中文注释英文化（修复 Claw 编辑编码错误） |
+| 2026-04-26 | `tdx_core/review_engine.py` | 新增 | 复盘核心引擎（趋势评分+量价分析+明日前瞻） |
+| 2026-04-26 | `scripts/daily_market_review.py` | 新增 | 每日技术复盘 CLI（十一维报告） |
+| 2026-04-26 | `tdx_core/reporting.py` | 修改 | 新增趋势评分/量价分析/明日前瞻报告板块 |
+| 2026-04-26 | `tdx_core/cli.py` | 修改 | 注册 `review` 子命令 |
