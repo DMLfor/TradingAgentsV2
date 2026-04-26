@@ -255,6 +255,87 @@ class ReportManager:
         return path
 
     # ──────────────────────────────────────────────────────────────
+    # Daily review reports
+    # ──────────────────────────────────────────────────────────────
+
+    def save_review_report(self, data: dict) -> Path:
+        """Save a daily market review report as Markdown."""
+        date_str = data.get("date", datetime.now().strftime("%Y-%m-%d"))
+        dir_path = self.base / "review" / date_str
+        dir_path.mkdir(parents=True, exist_ok=True)
+
+        front_matter = {
+            "type": "daily_review",
+            "date": date_str,
+            "sentiment": data.get("sentiment", {}).get("sentiment", "未知"),
+        }
+
+        md_lines = [
+            "---",
+            json.dumps(front_matter, ensure_ascii=False, indent=2),
+            "---",
+            "",
+            f"# A股每日技术复盘报告 — {date_str}",
+            "",
+            "## 一、大盘环境",
+            "",
+            self._overview_table(data.get("overview", [])),
+            "",
+            "## 二、市场风格",
+            "",
+            self._style_text(data.get("style", {})),
+            "",
+            "## 三、板块热力",
+            "",
+            "### 领涨 TOP5",
+            "",
+            self._sector_table(data.get("top5")),
+            "",
+            "### 领跌 TOP5",
+            "",
+            self._sector_table(data.get("bottom5")),
+            "",
+            "## 四、市场情绪",
+            "",
+            self._sentiment_text(data.get("sentiment", {})),
+            "",
+            "## 五、趋势评分",
+            "",
+            self._trend_score_text(data.get("trend_score", {})),
+            "",
+            "## 六、量价分析",
+            "",
+            self._volume_price_text(data.get("volume_price", {})),
+            "",
+            "## 七、明日前瞻",
+            "",
+            self._outlook_text(data.get("outlook", {})),
+            "",
+            "## 八、ETF 策略日报",
+            "",
+            self._etf_text(data.get("etf", [])),
+            "",
+            "## 九、信号雷达",
+            "",
+            self._signal_table(data.get("signals", [])),
+            "",
+            "## 十、回撤选股",
+            "",
+            self._pick_table(data.get("picks", [])),
+            "",
+            "## 十一、次日交易计划",
+            "",
+            data.get("action_plan", "（无）"),
+            "",
+            "---",
+            "*注: 本报告基于技术分析与历史数据。龙虎榜、消息面、北向资金等维度需外部数据源补充。*",
+        ]
+
+        report_path = dir_path / "daily_review.md"
+        report_path.write_text("\n".join(md_lines), encoding="utf-8")
+        return report_path
+
+    # ──────────────────────────────────────────────────────────────
     # Index update
     # ──────────────────────────────────────────────────────────────
 
@@ -302,6 +383,19 @@ class ReportManager:
                 for f in sorted(d.glob("*.md")):
                     lines.append(f"- [{f.stem}](ranking/{d.name}/{f.name})")
                 lines.append("")
+
+        # Review
+        review_dir = self.base / "review"
+        if review_dir.exists():
+            dates = sorted(review_dir.iterdir(), reverse=True)
+            for d in dates:
+                if not d.is_dir():
+                    continue
+                report = d / "daily_review.md"
+                if report.exists():
+                    lines.append(f"## {d.name} — 每日复盘")
+                    lines.append(f"- [每日技术复盘](review/{d.name}/daily_review.md)")
+                    lines.append("")
 
         index_path = self.base / "index.md"
         index_path.write_text("\n".join(lines), encoding="utf-8")
@@ -351,3 +445,211 @@ class ReportManager:
             else:
                 rows.append(f"| {label} | {v} |")
         return "| 指标 | 数值 |\n|------|------|\n" + "\n".join(rows)
+
+
+    @staticmethod
+    def _overview_table(overview: list[dict]) -> str:
+        if not overview:
+            return "暂无数据"
+        rows = []
+        for item in overview:
+            change_str = f"{item['change_pct']:+.2f}%"
+            if item.get("data_anomaly"):
+                change_str += " [数据异常]"
+            rows.append(
+                f"| {item['name']} | {item['close']:.2f} | "
+                f"{change_str} | {item['vol_ratio_5']:.2f} | "
+                f"{item['ma_state']} | {item['macd_state']} | {item['rsi']:.1f} |"
+            )
+        return (
+            "| 指数 | 收盘价 | 涨跌 | 量比 | 均线状态 | MACD | RSI |\n"
+            "|------|--------|------|------|----------|------|-----|\n"
+            + "\n".join(rows)
+        )
+
+    @staticmethod
+    def _style_text(style: dict) -> str:
+        large = style.get("large_return")
+        small = style.get("small_return")
+        diff = style.get("diff")
+        lines = [f"- **风格判断**: {style.get('style', '未知')}"]
+        if large is not None:
+            lines.append(f"- **大盘(沪深300) 20日收益**: {large:+.2f}%")
+        if small is not None:
+            lines.append(f"- **小盘(中证1000) 20日收益**: {small:+.2f}%")
+        if diff is not None:
+            lines.append(f"- **相对强弱差**: {diff:+.2f}%")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _sector_table(df) -> str:
+        if df is None or df.empty:
+            return "暂无数据"
+        rows = []
+        for _, row in df.iterrows():
+            rows.append(
+                f"| {row['sector']} | {row['avg_change_pct']:+.2f}% | "
+                f"{row.get('repr', '')} |"
+            )
+        return (
+            "| 板块 | 平均涨跌 | 代表个股 |\n"
+            "|------|----------|----------|\n"
+            + "\n".join(rows)
+        )
+
+    @staticmethod
+    def _sentiment_text(sentiment: dict) -> str:
+        if "error" in sentiment:
+            return f"[错误] {sentiment['error']}"
+        lines = [
+            f"- **全市场家数**: 共 {sentiment.get('total', 0)} 只",
+            f"- **上涨/下跌/平盘**: {sentiment.get('up', 0)} / {sentiment.get('down', 0)} / {sentiment.get('flat', 0)}",
+            f"- **涨停(近似)**: {sentiment.get('limit_up', 0)} 家",
+            f"- **跌停(近似)**: {sentiment.get('limit_down', 0)} 家",
+            f"- **涨跌停比**: {sentiment.get('limit_up', 0) / max(sentiment.get('limit_down', 1), 1):.2f}",
+            f"- **情绪档位**: {sentiment.get('sentiment', '未知')} — {sentiment.get('advice', '')}",
+        ]
+
+        # 趋势信息
+        trend = sentiment.get("trend", "")
+        stage = sentiment.get("stage", "")
+        if trend:
+            lines.append(f"- **情绪趋势**: {trend}（{stage}）")
+
+        history = sentiment.get("trend_history", [])
+        if history:
+            parts = []
+            for h in history:
+                date_short = str(h.get("date", ""))[-5:]
+                up_r = h.get("up_ratio", 0)
+                limit_up = h.get("limit_up", 0)
+                parts.append(f"{date_short} {up_r:.1%}({limit_up}涨)")
+            lines.append("- **近5日情绪轨迹**: " + " → ".join(parts))
+
+        # 新增：趋势评分 & 量价摘要（在情绪板块中简要展示）
+        trend_stage = sentiment.get("trend_stage", "")
+        trend_score = sentiment.get("trend_score", 0)
+        if trend_stage:
+            lines.append(f"- **大盘趋势**: {trend_stage} (评分: {trend_score})")
+        volume_state = sentiment.get("volume_state", "")
+        money_flow = sentiment.get("money_flow", "")
+        if volume_state:
+            lines.append(f"- **量能/资金**: {volume_state} | {money_flow}")
+        vp_notes = sentiment.get("vp_notes", [])
+        trend_notes = sentiment.get("trend_notes", [])
+        all_notes = trend_notes + vp_notes
+        if all_notes:
+            lines.append(f"- **修正提示**: {'；'.join(all_notes)}")
+
+        return "\n".join(lines)
+
+    @staticmethod
+    def _trend_score_text(trend_score: dict) -> str:
+        if not trend_score or "stage" not in trend_score:
+            return "暂无数据"
+        lines = [
+            f"- **趋势档位**: {trend_score.get('stage', '未知')}",
+            f"- **综合评分**: {trend_score.get('trend_score', 0)} (范围: -100~+100)",
+            f"- **即时技术面得分**: {trend_score.get('instant_score', 0)}",
+            f"- **历史位置修正**: {trend_score.get('position_penalty', 0)}",
+            f"- **连涨连跌修正**: {trend_score.get('consecutive_score', 0)}",
+            f"- **情绪分位修正**: {trend_score.get('emotion_hist_score', 0)}",
+            "",
+            "**评分说明**:",
+            "- ≥+40 强多头 | +10~+40 弱多头 | -10~+10 震荡 | -40~-10 弱空头 | ≤-40 强空头",
+            "- 即时技术面: 均线+MACD+RSI 加权评分",
+            "- 历史位置修正: 价格处于60日高低点分位的修正（高位减分/低位加分）",
+            "- 连涨连跌修正: 连续5天以上同向运行的修正（过热减分/超跌加分）",
+            "- 情绪分位修正: 当日上涨家数占比在近30日的百分位修正",
+        ]
+        return "\n".join(lines)
+
+    @staticmethod
+    def _volume_price_text(vp: dict) -> str:
+        if not vp:
+            return "暂无数据"
+        lines = [
+            f"- **量能状态**: {vp.get('volume_state', '未知')} (较5日均值: {vp.get('volume_change_pct', 0):+.1f}%)",
+            f"- **资金流向**: {vp.get('money_flow', '未知')}",
+            f"- **上涨股票成交额**: {vp.get('up_amount', 0):.1f} 亿元",
+            f"- **下跌股票成交额**: {vp.get('down_amount', 0):.1f} 亿元",
+            "",
+            "**量价背离检测**:",
+        ]
+        for d in vp.get("divergence", ["无明显背离"]):
+            lines.append(f"- {d}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _outlook_text(outlook: dict) -> str:
+        if not outlook:
+            return "暂无数据"
+        lines = [
+            f"- **支撑位**: {outlook.get('support', '未知')}",
+            f"- **压力位**: {outlook.get('resistance', '未知')}",
+            f"- **关键观察位**: {outlook.get('key_level', '未知')}",
+            "",
+            "**情景推演**:",
+        ]
+        for sc in outlook.get("scenarios", []):
+            lines.append(f"- **[{sc['label']}]** 概率{sc['prob']} — {sc['condition']} → **{sc['action']}**")
+        watch = outlook.get("watch_points", [])
+        if watch:
+            lines.append("")
+            lines.append("**明日观察要点**:")
+            for wp in watch:
+                lines.append(f"- {wp}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _etf_text(etf_list: list[dict]) -> str:
+        if not etf_list:
+            return "暂无数据"
+        lines = []
+        for etf in etf_list:
+            lines.append(f"### {etf['code']} ({etf['name']})")
+            lines.append(f"- **趋势状态**: {etf['state_zh']} ({etf['state']})")
+            lines.append(f"- **综合评分**: {etf['trend_score']}/10")
+            lines.append(f"- **RSI(14)**: {etf['rsi']:.1f}")
+            lines.append(f"- **布林带%B**: {etf['bb_pctb']:.3f}")
+            lines.append(f"- **ATR%**: {etf['atr_pct']:.2f}%")
+            if etf.get("vol_pct") is not None:
+                lines.append(f"- **ATR 百分位**: {etf['vol_pct']}%")
+            grid = etf.get("grid", {})
+            if grid.get("buy_levels"):
+                lines.append(f"- **买入网格**: {' / '.join(str(v) for v in grid['buy_levels'])}")
+            if grid.get("sell_levels"):
+                lines.append(f"- **卖出网格**: {' / '.join(str(v) for v in grid['sell_levels'])}")
+            lines.append(f"- **网格说明**: {grid.get('note', '')}")
+            lines.append("")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _signal_table(signals: list[dict]) -> str:
+        if not signals:
+            return "暂无数据"
+        rows = []
+        for s in signals:
+            rows.append(f"| {s['signal']} | {s['count']} | {s.get('repr', '')} |")
+        return (
+            "| 信号类型 | 触发数量 | 代表个股 |\n"
+            "|----------|----------|----------|\n"
+            + "\n".join(rows)
+        )
+
+    @staticmethod
+    def _pick_table(picks: list[dict]) -> str:
+        if not picks:
+            return "今日无符合条件的标的"
+        rows = []
+        for p in picks:
+            rows.append(
+                f"| {p['code']} | {p['name']} | {p['total_score']:.0f} | "
+                f"{p['entry_price']:.2f} | {p['stop_price']:.2f} | "
+                f"{p['target_price']:.2f} | {p['risk_reward']:.2f} | {p['position_suggestion']} |"
+            )
+        return (
+            "| 代码 | 名称 | 评分 | 买入价 | 止损 | 目标价 | 盈亏比 | 建议仓位 |\n"
+            "|------|------|------|--------|------|--------|--------|----------|\n"
+            + "\n".join(rows)
+        )

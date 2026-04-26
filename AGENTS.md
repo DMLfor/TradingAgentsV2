@@ -103,9 +103,16 @@ scripts/                         # CLI scripts (canonical source)
     etf_longterm_tracker.py      # ETF long-term tracker
   Strategy Backtest (1):
     strategy_backtest.py         # Multi-factor strategy backtest engine
+  Pullback Screener (4):
+    tech_screener.py             # 5-factor pullback stock picker + trade plan
+    backtest_screener.py         # Historical backtest for screener strategy
+    ablation_screener.py         # Batch ablation study (parallel)
+    baseline_screener.py         # Random-buy baseline comparison
+  Daily Market Review (1):
+    daily_market_review.py       # Daily technical review: market/style/sector/sentiment/trend/volume-price/outlook/ETF/signals/picks/plan
 
 tdx_core/                        # Python package
-  cli.py                         # Unified CLI entry (Click, 11 subcommands)
+  cli.py                         # Unified CLI entry (Click, 14 subcommands incl. pick, review)
   backtest/                      # Backtest engine, portfolio sim, metrics
   indicators/                    # 37 technical indicators
   analyzer.py                    # Signal detection, single-signal backtest
@@ -151,6 +158,10 @@ tdx sync --full --force --workers 8
 tdx task list
 tdx task check --today
 tdx task reload
+
+# 形态选股
+tdx pick --board 创业板 --min-score 55 --top 20 --save
+tdx pick --codes 300750,300059 --min-score 55
 
 # 辅助
 tdx list-indicators
@@ -292,9 +303,34 @@ results/
 
 ---
 
+## Pullback Screener Strategy (2026-04-25)
+
+5-factor scoring for "strong stock pullback" buy opportunities:
+
+| Factor | Weight | Key Rule |
+|:---|:---:|:---|
+| Trend | 25 | Close > MA60 (15pt) + MA60 rising (10pt) |
+| Pullback | 25 | 5-15% below 20-day high = 25pt (ideal zone) |
+| Oversold | 20 | RSI(14) 30-50 = 20pt |
+| Volume | 15 | Volume < 70% of 20-day avg = 15pt |
+| Momentum | 15 | MACD > 0 = 15pt |
+
+**Trade plan**: Entry = next-day open, Stop = MA60, Target = recent 20-day high, Max hold = 5 days.
+
+**Ablation study finding**: Relative-strength filter (5d return >= sector average) is the ONLY effective improvement:
+- Baseline: 43.5% win rate, +0.35% avg return, -0.93% median
+- +Relative strength: 50.7% win rate, +1.03% avg return, +0.21% median
+- +Combo C (all filters): 51.5% win rate, +1.13% avg return, +0.30% median
+
+Baseline comparison: Random buy-hold on 创业板 = +0.60% avg, 50.3% win rate. Strategy without relative strength UNDERPERFORMS random buying. WITH relative strength it OUTPERFORMS.
+
+**Key scripts**: `scripts/tech_screener.py` (scoring), `scripts/backtest_screener.py` (backtest), `scripts/ablation_screener.py` (batch experiments), `scripts/baseline_screener.py` (baseline).
+
+**Metadata JSON export**: `config/metadata_export/` contains 7 JSON files (stock_dict, boards, industries L1/L2/L3, matrix, summary) for fast cloud usage without database queries. See `config/metadata_export/README.md` for sector-strength filter code.
+
 ## When Working on This Project
 
-1. **Ask "which layer?"** before adding a new script: Data Pipeline / Single Stock / Batch / ETF Strategy / Backtest
+1. **Ask "which layer?"** before adding a new script: Data Pipeline / Single Stock / Batch / ETF Strategy / Backtest / Pullback Screener
 2. **Test with real data** before claiming something works
 3. **Run `json.dumps(obj)`** after any `to_dict()` implementation
 4. **Output in Chinese** for all CLI-facing `print()` and reports
@@ -304,3 +340,7 @@ results/
 8. **GBK encoding** — Windows PowerShell 中文输出避免 emoji 和特殊符号
 9. **CLI entry** — `tdx_core/cli.py` is the unified Click CLI. Add new subcommands via `@cli.command()`. Subcommands can either import script functions directly (for fast ones like `signal`) or delegate to `_run_script()` (for heavy ones like `analyze`). Both `tdx <cmd>` and `python scripts/xxx.py` must work.
 10. **PowerShell encoding fix** — ALL new CLI scripts MUST add `sys.stdout.reconfigure(encoding='utf-8')` at startup to prevent UnicodeEncodeError on Chinese output in GBK terminals.
+11. **Pullback screener rule**: Buy at next-day OPEN (not limit price). Stop = MA60 (not recent low - 3%). Filter out "fake pullbacks" with relative-strength check (stock 5d return >= sector average).
+12. **Data anomaly filter**: In backtest, `abs(return_pct) > 1000` marks data_error and excludes from stats (e.g., 平安银行 2026-04-21 spurious 4085 price).
+13. **Ablation precompute**: `ablation_screener.py` builds a cache of 27,740 (stock × date) metric tuples first, then runs experiments in parallel. This avoids re-computing the same metrics 8 times.
+14. **Metadata export sync**: After `export_metadata.py`, copy `config/metadata_export/` to `claw_ready/config/metadata_export/` because `claw_ready/` is gitignored.

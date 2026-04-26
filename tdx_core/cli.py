@@ -328,6 +328,28 @@ def pick(codes: str | None, watchlist: str | None, board: str | None,
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# review — 每日复盘
+# ═══════════════════════════════════════════════════════════════════════════
+
+@cli.command()
+@click.option("--date", "-d", help="复盘日期 YYYY-MM-DD")
+@click.option("--board", "-b", help="指定板块扫描")
+@click.option("--min-score", default=60, help="回撤选股最低分 (default: 60)")
+@click.option("--top-n", default=15, help="输出个股数量 (default: 15)")
+@click.option("--save", is_flag=True, help="保存报告")
+def review(date: str | None, board: str | None, min_score: int, top_n: int, save: bool):
+    """A股每日技术复盘 — 大盘/板块/情绪/ETF/信号/选股/交易计划."""
+    args = ["--min-score", str(min_score), "--top-n", str(top_n)]
+    if date:
+        args.extend(["--date", date])
+    if board:
+        args.extend(["--board", board])
+    if save:
+        args.append("--save")
+    _run_script("daily_market_review.py", args)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # list-indicators / list-strategies
 # ═══════════════════════════════════════════════════════════════════════════
 
